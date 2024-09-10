@@ -21,7 +21,15 @@ export const RoundNameCircle = ({ name, status }) => {
   const nameInitials = name.split(" ");
   nameInitials.forEach((value) => (initialNameValue += value[0]));
   return (
-    <div style={{ display: "flex", gap: "1.5em", alignItems: "center" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "1.5em",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "fit-content",
+      }}
+    >
       <Badge
         badgeContent={initialNameValue}
         id="userBadgeName"

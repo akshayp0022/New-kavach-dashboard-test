@@ -17,16 +17,17 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import TransitionsModal from "./Modal";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { columns } from "./Table/TableData";
-import { token } from "./Table/TableData";
+import { columns, token, moreHorizStyles } from "./Table/TableData";
 import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { moreHorizStyles } from "./Table/TableData";
 import { useState } from "react";
 import "../css/Modal.css";
 
@@ -157,22 +158,62 @@ export default function StickyHeadTable() {
         </Paper>
       </Container>
 
-      <div>
-        <Dialog open={open} onClose={handleClose}>
-          <div className="modal-header">
-            <DialogTitle>Modal Title</DialogTitle>
-            <DialogActions>
-              <CloseOutlinedIcon sx={{color: '#696969'}}/>
-            </DialogActions>
-          </div>
+      {/* ******************************************************* */}
 
-          <DialogContent>
-            <Typography>
-              This is the content of the modal. You can put any content here.
-            </Typography>
-          </DialogContent>
+      <div>
+        <Dialog open={open} onClose={handleClose} id="modal">
+          <div className="Modalwrapper">
+            <div className="sidebar-modal">
+              <div>
+                <Typography variant="h6" id='userName'>
+                  <RoundNameCircle name={'Harish'} status={'active'}/>
+                </Typography>
+                <Typography id='employeeId'>INT006</Typography>
+              </div>
+
+              <div>
+                <List>
+                  {[
+                    "Features Settings",
+                    "Forcefully Restart",
+                    "Screenshot email Data",
+                    "Website Settings",
+                    "Internet History",
+                    "Download History",
+                    "Download History",
+                    "Download History",
+                    "Download History",
+                  ].map((item, index) => (
+                    <ListItem key={index} id="listItem">
+                      <ListItemText primary={`${item}`} style={{fontSize: '10px'}}/>
+                    </ListItem>
+                  ))}
+                </List>
+              </div>
+            </div>
+
+            <div className="modal-feature">
+              <DialogContent>
+                <div className="modal-header">
+                  <DialogTitle style={{ padding: "16px 0px" }}>
+                    Modal Title
+                  </DialogTitle>
+                  <DialogActions onClick={handleClose}>
+                    <CloseOutlinedIcon sx={{ color: "#696969" }} />
+                  </DialogActions>
+                </div>
+
+                <Typography>
+                  This is the content of the modal. You can put any content
+                  here.
+                </Typography>
+              </DialogContent>
+            </div>
+          </div>
         </Dialog>
       </div>
+
+      {/* ******************************************************* */}
     </>
   );
 }

@@ -1,4 +1,104 @@
-.modal-header{
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Modalwrapper {
+  display: flex;
+  overflow: scroll;
+}
+
+#modal .MuiDialog-container .css-c09uja-MuiPaper-root-MuiDialog-paper {
+  display: flex;
+  width: 1024px;
+  max-width: none;
+}
+
+.sidebar-modal {
+  width: 30%;
+  padding: 1em 1.3em;
+  background-color: #f2f0eb;
+}
+
+.sidebar-modal li {
+  padding-left: 8px;
+  margin: 4px 0px;
+  cursor: pointer;
+}
+
+#employeeId{padding: 0px 24px;}
+
+.sidebar-modal li span{font-size: 0.9rem;}
+
+#listItem:hover {
+  background: #dbdbdb;
+  border-radius: 2px;
+}
+
+.modal-feature {
+  width: 100%;
+}
+
+.modal-feature div {
+  padding-top: 0px;
+}
+
+@media (max-width: 850px) {
+  .sidebar-modal li {
+    padding: 8px 0px;
+  }
+}
+
+@media (max-width: 730px) {
+  .Modalwrapper {
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .sidebar-modal {
+    padding: 0px 8px;
+    width: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 2em;
+    align-items: center;
+    padding: 4px;
+    overflow: scroll;
+  }
+
+  .sidebar-modal ul {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    gap: 1em;
+  }
+
+  .sidebar-modal ul li {
+    padding: 0;
+    min-width: fit-content;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: white;
+    color: #6754E2;
+    font-size: 10px;
+  }
+
+  .sidebar-modal div{
+    padding: 0px 6px;
+  }
+
+  .modal-feature div {
+    padding: 0px 4px;
+  }
+
+  #modal .MuiDialog-container .css-c09uja-MuiPaper-root-MuiDialog-paper {
+    display: flex;
+    width: 1024px;
+    max-width: none;
+    min-height: 100vh;
+  }
 }
