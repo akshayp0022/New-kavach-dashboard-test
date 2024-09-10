@@ -1,0 +1,95 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  overflow-x: hidden;
+}
+
+svg {
+  cursor: pointer;
+}
+
+#screen-collapse-bar svg {
+  margin-top: 0;
+}
+
+.tableData {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: end;
+}
+
+#tablePaper {
+  padding: 12px;
+  min-height: 100vh;
+}
+
+.upperSearch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1058px;
+  padding: 0px 8px;
+  margin: 12px 0px;
+}
+
+#textFieldSearch div div input {
+  padding: 10px 16px;
+}
+
+#textFieldSearch div label {
+  position: absolute;
+  top: -5px;
+}
+
+#userBadgeName {
+  position: relative;
+}
+
+#userBadgeName::before {
+  position: absolute;
+  content: "";
+  top: -16px;
+  left: -16px;
+  border-radius: 50%;
+  padding: 16px;
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow-x: hidden;
+  }
+  .upperSearch {
+    width: 96%;
+    align-items: start;
+    margin: 12px 24px;
+    gap: 6px;
+  }
+
+  .upperSearch p {
+    font-size: 14px;
+  }
+
+  .tableData {
+    align-items: start;
+    width: 100%;
+  }
+
+  #tableData {
+    padding: 0px;
+  }
+
+  #tablePaper {
+    width: 100vw;
+  }
+
+  #tableContainer {
+    max-height: 590px;
+  }
+}
