@@ -18,6 +18,7 @@
   width: 30%;
   padding: 1em 1.3em;
   background-color: #f2f0eb;
+  overflow: scroll;
 }
 
 .sidebar-modal li {
@@ -26,9 +27,14 @@
   cursor: pointer;
 }
 
-#employeeId{padding: 0px 24px;}
+#employeeId {
+  padding: 0px 24px;
+}
 
-.sidebar-modal li span{font-size: 0.9rem;}
+
+.sidebar-modal li span {
+  font-size: 0.9rem;
+}
 
 #listItem:hover {
   background: #dbdbdb;
@@ -41,6 +47,19 @@
 
 .modal-feature div {
   padding-top: 0px;
+}
+
+#userName{
+  padding: 12px 12px 4px 12px;
+}
+
+#userName .roundNameCircle{
+  gap: 1.2em;
+}
+
+#employeeId{
+  width: fit-content;
+  padding: 0 2.3em;
 }
 
 @media (max-width: 850px) {
@@ -67,7 +86,12 @@
     overflow: scroll;
   }
 
-  .sidebar-modal ul {
+  .sidebar-list {
+    overflow: scroll;
+    padding: 0px 8px;
+  }
+
+  .sidebar-list ul {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -76,18 +100,18 @@
     gap: 1em;
   }
 
-  .sidebar-modal ul li {
+  .sidebar-list ul li {
     padding: 0;
     min-width: fit-content;
     text-align: center;
     padding: 4px 8px;
     border-radius: 4px;
-    background-color: white;
-    color: #6754E2;
+    color: white;
+    background-color: #6754e2;
     font-size: 10px;
   }
 
-  .sidebar-modal div{
+  .sidebar-modal div {
     padding: 0px 6px;
   }
 
@@ -100,5 +124,17 @@
     width: 1024px;
     max-width: none;
     min-height: 100vh;
+  }
+
+  #userName{
+    padding: 12px 12px 4px 12px;
+  }
+
+  #userName .roundNameCircle{
+    gap: 1.2em;
+  }
+
+  #employeeId{
+    padding: 0 2.7em;
   }
 }

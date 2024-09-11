@@ -21,17 +21,9 @@ export const RoundNameCircle = ({ name, status }) => {
   const nameInitials = name.split(" ");
   nameInitials.forEach((value) => (initialNameValue += value[0]));
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "1.5em",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "fit-content",
-      }}
-    >
+    <div className="roundNameCircle">
       <Badge
-        badgeContent={initialNameValue}
+        badgeContent={initialNameValue.toUpperCase()}
         id="userBadgeName"
         sx={{
           borderRadius: "50%",
@@ -49,8 +41,13 @@ export const RoundNameCircle = ({ name, status }) => {
           },
           "& span": {
             borderRadius: "50%",
-            padding: nameInitials.length > 1 ? "0 4.5px" : "0 9px",
-            height: "26px",
+            padding:
+              (nameInitials.length == 1)
+                ? "0px 12px"
+                : nameInitials.length == 2
+                ? "0 8px"
+                : "0 3px",
+            height: '33px',
             fontWeight: 600,
             backgroundColor: "white",
             color: "#6754E2",

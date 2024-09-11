@@ -7,12 +7,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import Demo from "./ModalComponents/Demo";
 import { Box } from "@mui/material";
+import { Link, Route, Routes } from "react-router-dom";
 import {
   Container,
   TextField,
   Typography,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -38,6 +39,9 @@ export function createData(name, employee_id, status, action) {
 export default function StickyHeadTable() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isModal = useMediaQuery(
+    `(max-width:${theme.breakpoints.values.modal}px)`
+  );
   const [rowsData, setRowsData] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -165,13 +169,46 @@ export default function StickyHeadTable() {
           <div className="Modalwrapper">
             <div className="sidebar-modal">
               <div>
-                <Typography variant="h6" id='userName'>
-                  <RoundNameCircle name={'Harish'} status={'active'}/>
+                <Typography variant="h6" id="userName">
+                  <RoundNameCircle name={"Harish Puri"} status={"active"} />
                 </Typography>
-                <Typography id='employeeId'>INT006</Typography>
+                <Typography id="employeeId">INT006</Typography>
               </div>
 
-              <div>
+              {isModal ? (
+                <DialogActions onClick={handleClose}>
+                  <CloseOutlinedIcon sx={{ color: "#696969" }} />
+                </DialogActions>
+              ) : (
+                <div>
+                  <List>
+                    {[
+                      "Features Settings",
+                      "Forcefully Restart",
+                      "Screenshot email Data",
+                      "Website Settings",
+                      "Internet History",
+                      "Download History",
+                      "Download History",
+                      "Download History",
+                      "Download History",
+                    ].map((item, index) => (
+                      <Link to={`/members/${index}`} key={index}>
+                        <ListItem key={index} id="listItem">
+                          <ListItemText
+                            primary={`${item}`}
+                            style={{ fontSize: "10px" }}
+                          />
+                        </ListItem>
+                      </Link>
+                    ))}
+                  </List>
+                </div>
+              )}
+            </div>
+
+            {isModal ? (
+              <div className="sidebar-list">
                 <List>
                   {[
                     "Features Settings",
@@ -184,13 +221,20 @@ export default function StickyHeadTable() {
                     "Download History",
                     "Download History",
                   ].map((item, index) => (
-                    <ListItem key={index} id="listItem">
-                      <ListItemText primary={`${item}`} style={{fontSize: '10px'}}/>
-                    </ListItem>
+                    <Link to={`/members/${index}`} key={index}>
+                      <ListItem key={index} id="listItem">
+                        <ListItemText
+                          primary={`${item}`}
+                          style={{ fontSize: "10px" }}
+                        />
+                      </ListItem>
+                    </Link>
                   ))}
                 </List>
               </div>
-            </div>
+            ) : (
+              ""
+            )}
 
             <div className="modal-feature">
               <DialogContent>
@@ -198,14 +242,17 @@ export default function StickyHeadTable() {
                   <DialogTitle style={{ padding: "16px 0px" }}>
                     Modal Title
                   </DialogTitle>
-                  <DialogActions onClick={handleClose}>
-                    <CloseOutlinedIcon sx={{ color: "#696969" }} />
-                  </DialogActions>
+                  {!isModal && (
+                    <DialogActions onClick={handleClose}>
+                      <CloseOutlinedIcon sx={{ color: "#696969" }} />
+                    </DialogActions>
+                  )}
                 </div>
 
                 <Typography>
-                  This is the content of the modal. You can put any content
-                  here.
+                  <Routes>
+                    <Route path="/members/demo" element={<Demo pageName={'Harish Puri'}/>}/>
+                  </Routes>
                 </Typography>
               </DialogContent>
             </div>

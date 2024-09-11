@@ -11,7 +11,8 @@ export const moreHorizStyles = {
   },
 };
 
-export const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGVjODQ1ZmY5ODU4NjI2NGVlMWYxMiIsImlhdCI6MTcyNTk3NDY3MywiZXhwIjoxNzI1OTc4MjczfQ.YexU1emclRVWpB_ww4qvzwjHpQW85JDptA7M0tRw6eE'
+export const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGVjODQ1ZmY5ODU4NjI2NGVlMWYxMiIsImlhdCI6MTcyNjA1OTI4MSwiZXhwIjoxNzI2MDYyODgxfQ.1TdpM7rwZfSmG3fY89tnKWUBGF0zVnEbWBl7X0HFHQs";
 
 export const columns = [
   {
