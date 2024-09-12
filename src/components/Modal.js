@@ -3,8 +3,14 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import FeatureSettings from './ModalComponents/FeatureSettings'
+import ForceFullyRestart from './ModalComponents/ForceFullyRestart'
+import ScreenShotData from './ModalComponents/ScreenShotData'
+import WebsiteSetting from './ModalComponents/WebsiteSetting'
+import InternetHistory from './ModalComponents/InternetHistory'
+import DownloadHistory from './ModalComponents/DownloadHistory'
+import NoExistence from './ModalComponents/NoExistence'
 
 const style = {
   position: "absolute",
@@ -25,8 +31,6 @@ export default function TransitionsModal() {
 
   return (
     <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
-
       <Modal handleOpen={handleOpen}
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -53,4 +57,29 @@ export default function TransitionsModal() {
       </Modal>
     </div>
   );
+}
+
+
+export const ModalContent = ({ contentValue }) => {
+  switch (contentValue){
+    case 'features_settings' :
+      return <FeatureSettings />
+
+    case 'forcefully_restart' : 
+      return <ForceFullyRestart />
+
+    case 'screenshot_email_data' :
+      return <ScreenShotData />
+
+    case 'website_settings' :
+      return <WebsiteSetting />
+
+    case 'internet_history':
+      return <InternetHistory />
+
+    case 'download_history' :
+      return <DownloadHistory />
+
+    default : return <FeatureSettings />
+  }
 }

@@ -7,9 +7,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Demo from "./ModalComponents/Demo";
+import { ModalContent } from "./Modal";
 import { Box } from "@mui/material";
-import { Link, Route, Routes } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -25,12 +24,13 @@ import {
 import TransitionsModal from "./Modal";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { columns, token, moreHorizStyles } from "./Table/TableData";
+import { columns, moreHorizStyles, modalList } from "./Table/TableData";
 import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useState } from "react";
 import "../css/Modal.css";
+import { token } from './userData'
 
 export function createData(name, employee_id, status, action) {
   return { name, employee_id, status, action };
@@ -47,6 +47,8 @@ export default function StickyHeadTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [open, setOpen] = useState(false);
 
+  const [modalContent, handleModalContent] = useState(false);
+
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -54,6 +56,10 @@ export default function StickyHeadTable() {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleChangeModalContent = (newValue) => {
+    handleModalContent(newValue);
   };
   // **************
 
@@ -80,12 +86,29 @@ export default function StickyHeadTable() {
     getData();
   }, []);
 
-  const rows = rowsData.map((value) => {
+  const rowsDataH = [
+    {
+      name: 'Harish Puri',
+      status: 'active'
+    },
+
+    {
+      name: 'Karan Puri',
+      status: 'deactivated'
+    },
+
+    {
+      name: 'Lokesh Puri',
+      status: 'ideal'
+    }
+  ]
+
+  const rows = rowsDataH.map((value) => {
     console.log(value);
     return createData(
-      <RoundNameCircle name={`${value.name}`} status={"deactivated"} />,
+      <RoundNameCircle name={`${value.name}`} status={value.status} />,
       `${value.employeeId}`,
-      <BadgeIcon status={"deactivated"} />,
+      <BadgeIcon status={value.status} />,
       <MoreHorizIcon sx={moreHorizStyles} onClick={handleClickOpen} />
     );
   });
@@ -162,8 +185,6 @@ export default function StickyHeadTable() {
         </Paper>
       </Container>
 
-      {/* ******************************************************* */}
-
       <div>
         <Dialog open={open} onClose={handleClose} id="modal">
           <div className="Modalwrapper">
@@ -182,25 +203,21 @@ export default function StickyHeadTable() {
               ) : (
                 <div>
                   <List>
-                    {[
-                      "Features Settings",
-                      "Forcefully Restart",
-                      "Screenshot email Data",
-                      "Website Settings",
-                      "Internet History",
-                      "Download History",
-                      "Download History",
-                      "Download History",
-                      "Download History",
-                    ].map((item, index) => (
-                      <Link to={`/members/${index}`} key={index}>
-                        <ListItem key={index} id="listItem">
-                          <ListItemText
-                            primary={`${item}`}
-                            style={{ fontSize: "10px" }}
-                          />
-                        </ListItem>
-                      </Link>
+                    {modalList.map((item, index) => (
+                      <ListItem
+                        key={index}
+                        id="listItem"
+                        onClick={() =>
+                          handleChangeModalContent(
+                            item.split(" ").join("_").toLowerCase()
+                          )
+                        }
+                      >
+                        <ListItemText
+                          primary={`${item}`}
+                          style={{ fontSize: "10px" }}
+                        />
+                      </ListItem>
                     ))}
                   </List>
                 </div>
@@ -210,25 +227,21 @@ export default function StickyHeadTable() {
             {isModal ? (
               <div className="sidebar-list">
                 <List>
-                  {[
-                    "Features Settings",
-                    "Forcefully Restart",
-                    "Screenshot email Data",
-                    "Website Settings",
-                    "Internet History",
-                    "Download History",
-                    "Download History",
-                    "Download History",
-                    "Download History",
-                  ].map((item, index) => (
-                    <Link to={`/members/${index}`} key={index}>
-                      <ListItem key={index} id="listItem">
-                        <ListItemText
-                          primary={`${item}`}
-                          style={{ fontSize: "10px" }}
-                        />
-                      </ListItem>
-                    </Link>
+                  {modalList.map((item, index) => (
+                    <ListItem
+                      key={index}
+                      id="listItem"
+                      onClick={() =>
+                        handleChangeModalContent(
+                          item.split(" ").join("_").toLowerCase()
+                        )
+                      }
+                    >
+                      <ListItemText
+                        primary={`${item}`}
+                        style={{ fontSize: "10px" }}
+                      />
+                    </ListItem>
                   ))}
                 </List>
               </div>
@@ -240,7 +253,7 @@ export default function StickyHeadTable() {
               <DialogContent>
                 <div className="modal-header">
                   <DialogTitle style={{ padding: "16px 0px" }}>
-                    Modal Title
+                    <ModalContent contentValue={modalContent} />
                   </DialogTitle>
                   {!isModal && (
                     <DialogActions onClick={handleClose}>
@@ -248,19 +261,11 @@ export default function StickyHeadTable() {
                     </DialogActions>
                   )}
                 </div>
-
-                <Typography>
-                  <Routes>
-                    <Route path="/members/demo" element={<Demo pageName={'Harish Puri'}/>}/>
-                  </Routes>
-                </Typography>
               </DialogContent>
             </div>
           </div>
         </Dialog>
       </div>
-
-      {/* ******************************************************* */}
     </>
   );
 }

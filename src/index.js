@@ -1,17 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ThemeProvider } from "@emotion/react";
+import { AppProvider } from "./components/AppContext";
 import CustomTheme from "./theme/theme";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-    <ThemeProvider theme={CustomTheme}>
-      <App />
-    </ThemeProvider>
-    </BrowserRouter>
+    <AppProvider>
+      <ThemeProvider theme={CustomTheme}>
+        <App />
+      </ThemeProvider>
+    </AppProvider>
   </React.StrictMode>
 );

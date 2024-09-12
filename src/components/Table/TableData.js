@@ -11,8 +11,14 @@ export const moreHorizStyles = {
   },
 };
 
-export const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGVjODQ1ZmY5ODU4NjI2NGVlMWYxMiIsImlhdCI6MTcyNjA1OTI4MSwiZXhwIjoxNzI2MDYyODgxfQ.1TdpM7rwZfSmG3fY89tnKWUBGF0zVnEbWBl7X0HFHQs";
+export const modalList = [
+  "Features Settings",
+  "Forcefully Restart",
+  "Screenshot email Data",
+  "Website Settings",
+  "Internet History",
+  "Download History",
+];
 
 export const columns = [
   {
