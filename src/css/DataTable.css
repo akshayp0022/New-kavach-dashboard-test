@@ -1,0 +1,36 @@
+div[data-field=id]{
+    padding: 10px 20px;
+}
+
+#tableCellHoriz{
+    border-radius: 50%;
+}
+
+#tableCellHoriz:hover{
+    background: lightgray;
+}
+
+div[data-field="id"]{
+    padding: 0px 20px;
+}
+
+.css-rsks93-MuiPaper-root-MuiDialog-paper{
+    max-width: none !important;
+    width: 100%;
+}
+
+.Modalwrapper{
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+@media (max-width: 730px){
+    .Modalwrapper{
+        width: 100%;
+        height: 100%;
+    }
+
+    div[data-field='id']{
+        padding: 0px 20px;
+    }
+}

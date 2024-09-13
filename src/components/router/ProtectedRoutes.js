@@ -1,20 +1,19 @@
-import React from 'react'
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../AppContext';
 
 function ProtectedRoutes({ Component }) {
-    const  navigate = useNavigate();
     let { isLoggedIn } = useAppContext();
+    const navigate = useNavigate();
     console.log(isLoggedIn)
 
     useEffect(() => {
         if(!isLoggedIn){
-            navigate('/login');
+            navigate('login')
         }
-    })
+    }, [isLoggedIn])
     return (
-        Component
+        <Outlet />
     )
 }
 

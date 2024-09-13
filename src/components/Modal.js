@@ -10,7 +10,6 @@ import ScreenShotData from './ModalComponents/ScreenShotData'
 import WebsiteSetting from './ModalComponents/WebsiteSetting'
 import InternetHistory from './ModalComponents/InternetHistory'
 import DownloadHistory from './ModalComponents/DownloadHistory'
-import NoExistence from './ModalComponents/NoExistence'
 
 const style = {
   position: "absolute",

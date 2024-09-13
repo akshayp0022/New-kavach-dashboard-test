@@ -3,7 +3,7 @@ import React from 'react'
 function WebsiteSetting() {
     return (
         <div>
-            <h1>Website Settings</h1>
+            <h4>Website Settings</h4>
         </div>
     )
 }

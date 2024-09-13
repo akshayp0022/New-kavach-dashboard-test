@@ -3,7 +3,7 @@ import React from 'react'
 function NoExistence() {
     return (
         <div>
-            <h1>404! Content Did Not Exist</h1>
+            <h4>404! Content Did Not Exist</h4>
         </div>
     )
 }

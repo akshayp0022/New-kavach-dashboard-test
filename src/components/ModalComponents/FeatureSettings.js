@@ -3,7 +3,7 @@ import React from 'react'
 function FeatureSettings() {
     return (
         <div>
-            <h1>Feature Settings</h1>
+            <h3>Feature Settings</h3>
         </div>
     )
 }

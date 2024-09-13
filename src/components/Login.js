@@ -10,10 +10,10 @@ const SignUpPage = () => {
       <Box>
         <Typography className="logo">
           <Shield sx={{ color: "#6754E2", fontSize: "3em" }} />
-          <div>
+          <span>
             <span id="KLetter">K</span>
             <span id="restLetter">avach</span>
-          </div>
+          </span>
         </Typography>
 
         <Typography variant="h3" fontSize={36} fontWeight={600}>

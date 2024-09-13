@@ -8,6 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { ModalContent } from "./Modal";
+import { DataGrid } from '@mui/x-data-grid';
 import { Box } from "@mui/material";
 import {
   Container,

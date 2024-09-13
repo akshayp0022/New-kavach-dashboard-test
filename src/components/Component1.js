@@ -12,7 +12,7 @@ function C1({ pageName }) {
       }}
     >
         <Typography variant="h1">
-            <h1>Hello User this is Harish</h1>
+            {pageName}
         </Typography>
 
     </Box>

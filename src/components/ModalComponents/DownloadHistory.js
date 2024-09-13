@@ -3,7 +3,7 @@ import React from 'react'
 function DownloadHistory() {
     return (
         <div>
-            <h1>Download History</h1>
+            <h3>Download History</h3>
         </div>
     )
 }
