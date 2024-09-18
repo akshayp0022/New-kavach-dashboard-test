@@ -9,6 +9,10 @@ html {
   overflow-x: hidden;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
 svg {
   cursor: pointer;
 }
@@ -17,7 +21,7 @@ svg {
   margin-top: 0;
 }
 
-.tableData {
+#tableData {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -38,7 +42,8 @@ svg {
   gap: 1.8em;
   align-items: center;
   justify-content: center;
-  width: fit-content;
+  width: max-content;
+  cursor: pointer;
 }
 
 .upperSearch {
@@ -98,10 +103,14 @@ svg {
   }
 
   #tablePaper {
-    width: 100vw;
+    min-width: 100vw;
   }
 
   #tableContainer {
     max-height: 590px;
   }
+}
+
+.css-io5c2v-MuiContainer-root{
+  width: none;
 }

@@ -1,2 +1,1 @@
-export const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGVjODQ1ZmY5ODU4NjI2NGVlMWYxMiIsImlhdCI6MTcyNjIzMjc1NiwiZXhwIjoxNzI2MjM2MzU2fQ.T7b5QgtFQsci-iuPzW7P8a4kLGZ6cC28J-NtWTO1LRs";
+export const token = sessionStorage.getItem('jwtToken') || undefined;

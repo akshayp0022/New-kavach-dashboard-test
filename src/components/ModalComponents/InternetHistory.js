@@ -3,7 +3,7 @@ import React from 'react'
 function InternetHistory() {
     return (
         <div>
-            <h4>Internet History</h4>
+            <h3>Internet History</h3>
         </div>
     )
 }

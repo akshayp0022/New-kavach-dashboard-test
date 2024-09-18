@@ -3,7 +3,7 @@ import React from 'react'
 function ScreenShotData() {
     return (
         <div>
-            <h4>ScreenShot Data</h4>
+            <h3>ScreenShot Data</h3>
         </div>
     )
 }

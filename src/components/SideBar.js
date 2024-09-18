@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Drawer,
@@ -17,27 +17,28 @@ import {
   NotificationsNoneOutlined as NotificationsNoneOutlinedIcon,
   StoreOutlined as StoreOutlinedIcon,
 } from "@mui/icons-material";
-
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import { NavLink, Outlet } from "react-router-dom";
 import { styled } from "@mui/system";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { fourIconsCommonStyle, NavlinkStyles } from "./Sidebar/Data";
-
 import SideBarLogoList from "./Sidebar/SideBarLogoList";
 import MappingList from "./Sidebar/MappingList";
+import { useAppContext } from "./AppContext";
+import NavBar from "./NavBar";
+import "../css/customs.css";
 
 export const StyledNavLink = styled(NavLink)(() => NavlinkStyles);
 function CollapsibleSidebar() {
   const theme = useTheme();
+  const { open, toggleDrawer } = useAppContext();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const [open, setOpen] = useState(true);
 
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  useEffect(() => {
+    console.log(open);
+  }, [open]);
 
   return (
     <>
@@ -151,26 +152,7 @@ function CollapsibleSidebar() {
               <Container
                 sx={{ padding: 0, margin: 0, position: "fixed", left: -25 }}
               >
-                <ListItem
-                  sx={{ padding: "0px", cursor: "pointer" }}
-                  onClick={toggleDrawer}
-                >
-                  <ListItemIcon
-                    id="screen-collapse-bar"
-                    sx={{
-                      padding: "0.5em",
-                      backgroundColor: "#6754E2",
-                      color: "#ffffff",
-                    }}
-                  >
-                    <MenuIcon
-                      sx={{
-                        display: open ? "none" : "block",
-                        marginTop: "20px",
-                      }}
-                    />
-                  </ListItemIcon>
-                </ListItem>
+                <NavBar onClick={(event) => event.stopPropogation()} />
               </Container>
               <SideBarLogoList />
             </React.Fragment>

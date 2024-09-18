@@ -24,6 +24,22 @@ div[data-field="id"]{
     overflow: hidden;
 }
 
+.css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-cell--textRight div{
+    padding-left: 12px !important;
+}
+
+.css-1owgq8r-MuiDataGrid-root .MuiDataGrid-cell--textRight div{
+    padding-left: 8px;
+}
+
+.css-13dpm03-MuiBadge-root span{
+    margin-top: 25px;
+}
+
+.css-y4n9bg-MuiFormControl-root-MuiTextField-root{
+    width: 30% !important;
+}
+
 @media (max-width: 730px){
     .Modalwrapper{
         width: 100%;
@@ -32,5 +48,9 @@ div[data-field="id"]{
 
     div[data-field='id']{
         padding: 0px 20px;
+    }
+
+    .css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-cell--textRight div{
+        padding-left: 8px;
     }
 }

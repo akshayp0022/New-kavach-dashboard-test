@@ -1,5 +1,5 @@
 import React from "react";
-import NavigationBar from "../SideBar";
+import AllNavigationBar from "../SideBar";
 import { Routes, Route } from "react-router-dom";
 import C1 from "../Component1";
 import StickyHeadTable from "../OldTable";
@@ -16,7 +16,7 @@ function RoutesHandler() {
         <Route path="/login" element={<Login />} />
 
         <Route element={<ProtectedRoutes />}>
-          <Route path='/' element={<NavigationBar />}>
+          <Route path='/' element={<AllNavigationBar />}>
             <Route path='/dashboard' element={<C1 pageName={'Dashboard'}/>}/>
             <Route path='/screenshot' element={<C1 pageName={'ScreenShot'}/>}/>
             <Route path='/apps' element={<C1 pageName={'Apps'}/>}/>

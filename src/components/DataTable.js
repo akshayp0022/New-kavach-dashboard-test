@@ -22,14 +22,22 @@ import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
 import TransitionsModal from "./Modal";
 import { ModalContent } from "./Modal";
 import { useState, useEffect } from "react";
-import { Newcolumns } from "./Table/TableData";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { useAppContext } from "./AppContext";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import NumbersOutlinedIcon from '@mui/icons-material/NumbersOutlined';
+import { Text_Icon } from "./Table/TableComponents";
 import "../css/Modal.css";
 import "../css/DataTable.css";
 
 const DataTable = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMidScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { open: isSideBarOpen, windowWidth } = useAppContext();
   const isModal = useMediaQuery(
     `(max-width:${theme.breakpoints.values.modal}px)`
   );
@@ -91,9 +99,71 @@ const DataTable = () => {
     },
   ];
 
+  const Newcolumns = [
+    {
+      field: 'id',
+      headerName: (
+        <Text_Icon
+          text={"No."}
+          Icon={<NumbersOutlinedIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+      width: 90,
+      align: 'center'
+    },
+    {
+      field: "name",
+      headerName: (
+        <Text_Icon
+          text={"Name"}
+          Icon={<AccountCircleIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+      renderCell: (params => params.value),
+      width: isMidScreen ? 150 : !isSideBarOpen ? Math.round((windowWidth / 5)) - 40 : Math.round((windowWidth / 5)) - 40,
+      align: 'right'
+    },
+    {
+      field: "employeeId",
+      headerName: (
+        <Text_Icon
+          text={"Employee Id"}
+          Icon={<BadgeOutlinedIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+      width: isMidScreen ? 150 : !isSideBarOpen ? Math.round((windowWidth / 3.5)) - 40 : Math.round((windowWidth / 3.5)) - 90,
+      align: "left",
+    },
+    {
+      field: "status",
+      headerName: (
+        <Text_Icon
+          text={"Status"}
+          Icon={<CheckCircleOutlineIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+  
+      renderCell: (params) => params.value,
+      width: isMidScreen ? 150 : !isSideBarOpen ? Math.round((windowWidth / 3.5)) - 40 : Math.round((windowWidth / 3.5)) - 120,
+      align: "center",
+    },
+    {
+      field: "action",
+      headerName: (
+        <Text_Icon
+          text={"Action"}
+          Icon={<SettingsSuggestOutlinedIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+      renderCell: (params) =>params.value,
+      width: 150,
+      align: "left",
+    },
+  ];
+
   const getData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/users/get", {
+      const response = await fetch("http://localhost:5001/api/users/get", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -102,13 +172,13 @@ const DataTable = () => {
       });
       const { users } = await response.json();
       const finalRenderingData = users.map(
-        ({ name, _id, status, employeeId }) => {
+        ({ name, _id, status, employeeId }, index) => {
           return {
-            id: _id,
+            id: index+1,
             status: <BadgeIcon status={'active'} />,
             name: (
               <div>
-                <RoundNameCircle name={`${name}`} status={'active'} /> {employeeId},
+                <RoundNameCircle name={`${name.trim()}`} status={'active'} /> {employeeId},
               </div>
             ),
             action: (
@@ -120,6 +190,7 @@ const DataTable = () => {
       );
 
       setRowsData(finalRenderingData);
+      console.log(users)
     } catch (err) {
       console.log(err.message);
     } finally {
@@ -134,13 +205,15 @@ const DataTable = () => {
   return (
     <>
       <Container
-        maxWidth={isSmallScreen ? false : "xl"}
-        sx={{ width: "100%" }}
+        maxWidth={isSmallScreen ? false : "100vw"}
+        sx={{ width: "100%",marginTop: '5em'}}
         className="tableData"
         id="tableData"
       >
-        <Paper sx={{ width: "80%", overflow: "hidden" }} id="tablePaper">
-          <div className="upperSearch">
+        <Paper sx={{ width: "80%", overflow: "hidden" }} id="tablePaper" style={{
+          width: isSideBarOpen ? '83%' : '92vw'
+        }}>
+          <div className="upperSearch" style={{maxWidth: isSideBarOpen ? '1058px' : '1210px'}}>
             <Typography fontWeight={600} fontSize={16}>
               {`All Users (${rows.length})`}
             </Typography>
