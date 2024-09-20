@@ -20,7 +20,7 @@ import { token } from "./userData";
 import { modalList } from "./Table/TableData";
 import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
 import TransitionsModal from "./Modal";
-import { ModalContent } from "./Modal";
+import { ModalContentTitle, ModalContent } from "./Modal";
 import { useState, useEffect } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useAppContext } from "./AppContext";
@@ -170,6 +170,7 @@ const DataTable = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      
       const { users } = await response.json();
       const finalRenderingData = users.map(
         ({ name, _id, status, employeeId }, index) => {
@@ -301,7 +302,7 @@ const DataTable = () => {
             <DialogContent>
               <div className="modal-header">
                 <DialogTitle style={{ padding: "16px 0px" }}>
-                  <ModalContent contentValue={modalContent} />
+                  <ModalContentTitle contentValue={modalContent} />
                 </DialogTitle>
                 {!isModal && (
                   <DialogActions onClick={handleClose}>
@@ -309,6 +310,10 @@ const DataTable = () => {
                   </DialogActions>
                 )}
               </div>
+
+              <DialogContent>
+                <ModalContent contentValue={modalContent}/>
+              </DialogContent>
             </DialogContent>
           </div>
         </div>

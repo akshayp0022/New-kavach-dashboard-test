@@ -4,12 +4,12 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
-import FeatureSettings from './ModalComponents/FeatureSettings'
-import ForceFullyRestart from './ModalComponents/ForceFullyRestart'
-import ScreenShotData from './ModalComponents/ScreenShotData'
-import WebsiteSetting from './ModalComponents/WebsiteSetting'
-import InternetHistory from './ModalComponents/InternetHistory'
-import DownloadHistory from './ModalComponents/DownloadHistory'
+import FeatureSettings from "./ModalComponents/FeatureSettings";
+import ForceFullyRestart from "./ModalComponents/ForceFullyRestart";
+import ScreenShotData from "./ModalComponents/ScreenShotData";
+import WebsiteSetting from "./ModalComponents/WebsiteSetting";
+import InternetHistory from "./ModalComponents/InternetHistory";
+import DownloadHistory from "./ModalComponents/DownloadHistory";
 
 const style = {
   position: "absolute",
@@ -30,13 +30,14 @@ export default function TransitionsModal() {
 
   return (
     <div>
-      <Modal handleOpen={handleOpen}
+      <Modal
+        handleOpen={handleOpen}
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={open}
         onClose={handleClose}
         closeAfterTransition
-        slots={{ backdrop: Backdrop }}     
+        slots={{ backdrop: Backdrop }}
         slotProps={{
           backdrop: {
             timeout: 500,
@@ -58,27 +59,52 @@ export default function TransitionsModal() {
   );
 }
 
+export const ModalContentTitle = ({ contentValue }) => {
+  switch (contentValue) {
+    case "features_settings":
+      return <Typography variant="h4">Features Settings</Typography>;
+
+    case "forcefully_restart":
+      return <Typography variant="h4">Forcefully Restart</Typography>;
+
+    case "screenshot_email_data":
+      return <Typography variant="h4">Screenshot and Email Data</Typography>;
+
+    case "website_settings":
+      return <Typography variant="h4">Website Settings</Typography>;
+
+    case "internet_history":
+      return <Typography variant="h4">Internet History</Typography>;
+
+    case "download_history":
+      return <Typography variant="h4">Download History</Typography>;
+
+    default:
+      return <Typography variant="h4">Features Settings</Typography>;
+  }
+};
 
 export const ModalContent = ({ contentValue }) => {
-  switch (contentValue){
-    case 'features_settings' :
-      return <FeatureSettings />
+  switch (contentValue) {
+    case "features_settings":
+      return <FeatureSettings />;
 
-    case 'forcefully_restart' : 
-      return <ForceFullyRestart />
+    case "forcefully_restart":
+      return <ForceFullyRestart />;
 
-    case 'screenshot_email_data' :
-      return <ScreenShotData />
+    case "screenshot_email_data":
+      return <ScreenShotData />;
 
-    case 'website_settings' :
-      return <WebsiteSetting />
+    case "website_settings":
+      return <WebsiteSetting />;
 
-    case 'internet_history':
-      return <InternetHistory />
+    case "internet_history":
+      return <InternetHistory />;
 
-    case 'download_history' :
-      return <DownloadHistory />
+    case "download_history":
+      return <DownloadHistory />;
 
-    default : return <FeatureSettings />
+    default:
+      return <FeatureSettings />;
   }
-}
+};

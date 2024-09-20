@@ -23,6 +23,8 @@ export const modalList = [
   "Website Settings",
   "Internet History",
   "Download History",
+  'Keylogger History',
+  'Wallpaper Settings'
 ];
 
 export const columns = [

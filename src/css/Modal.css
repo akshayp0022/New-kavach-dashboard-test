@@ -5,15 +5,30 @@
 
 .Modalwrapper {
   display: flex;
-  overflow: scroll;
   height: 100%;
+  ::-webkit-scrollbar{
+    display: none;
+  }
 }
 
 #modal .MuiDialog-container .css-c09uja-MuiPaper-root-MuiDialog-paper {
   display: flex;
   width: 100%;
   max-width: none;
-  height: 100%;
+}
+
+.css-rsks93-MuiPaper-root-MuiDialog-paper{
+  overflow: hidden !important;
+}
+
+.modal-feature{
+  overflow: hidden;
+}
+
+.modal-feature div:first-child{
+  ::-webkit-scrollbar{
+    display: none !important;
+  }
 }
 
 .sidebar-modal {
@@ -46,6 +61,8 @@
 
 .modal-feature {
   width: 100%;
+  height: calc(100vh - 100px); /* Adjust this if necessary to fit your modal */
+  overflow-y: auto; /* Added scroll functionality */
 }
 
 .modal-feature div {
@@ -63,6 +80,17 @@
 #employeeId{
   width: fit-content;
   padding: 0 2.3em;
+}
+
+
+#downloadHistoryList{
+  padding: 1.5em 1em;
+  word-break: break-all;
+  background-color: #f1f1f1;
+  margin: 1.8em 0em;
+  border-radius: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
 }
 
 @media (max-width: 850px) {

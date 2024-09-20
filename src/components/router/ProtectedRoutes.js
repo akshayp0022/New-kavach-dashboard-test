@@ -5,7 +5,6 @@ import { useAppContext } from '../AppContext';
 function ProtectedRoutes({ Component }) {
     let { isLoggedIn } = useAppContext();
     const navigate = useNavigate();
-    console.log(isLoggedIn)
 
     useEffect(() => {
         if(!isLoggedIn){

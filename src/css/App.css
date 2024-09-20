@@ -78,6 +78,38 @@ svg {
   padding: 20px;
 }
 
+.css-1qdzy9k-MuiBarElement-root{
+  fill: #9a64e0 !important;
+}
+
+#downloadHistory{
+  position: relative;
+  padding-top: 2em;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#downloadHistory::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(to bottom right, rgb(247, 247, 247), rgb(238, 238, 238));
+  filter: blur(8px);
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+#downloadHistory div{
+  display: flex;
+  align-items: center;
+}
+
+.MuiDialogContent-root .css-1kxd7on-MuiDialogContent-root{
+  padding-left: 0px;
+}
+
 @media (max-width: 900px) {
   body {
     overflow-x: hidden;
