@@ -16,9 +16,9 @@ export const Text_Icon = ({ text, Icon }) => {
   );
 };
 
-export const RoundNameCircle = ({ name, status }) => {
+export const RoundNameCircle = ({ name="", status }) => {
   let initialNameValue = "";
-  const nameInitials = name.split(" ");
+  let nameInitials = name.split(" ");
   nameInitials.forEach((value) => (initialNameValue += value[0]));
   return (
     <div className="roundNameCircle">
@@ -42,9 +42,9 @@ export const RoundNameCircle = ({ name, status }) => {
           "& span": {
             borderRadius: "50%",
             padding:
-              (nameInitials.length == 1)
+              (nameInitials.length === 1)
                 ? "0px 12px"
-                : nameInitials.length == 2
+                : nameInitials.length === 2
                 ? "0 8px"
                 : "0 3px",
             height: '33px',

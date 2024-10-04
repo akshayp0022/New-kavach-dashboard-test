@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { createContext, useContext } from "react";
-
+import endpoints from "../endpoints";
+import { fireEvent } from "@testing-library/react";
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [isLoggedIn, setLoggedIn] = useState(
-    sessionStorage.getItem("jwtToken") ? true : false
-  );
+  const [isLoggedIn, setLoggedIn] = useState(false);
   const [open, setOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [downloadHistory, setDownloadHistory] = useState([]);
   const [internetHistory, setInternetHitory] = useState([]);
   const [tokenExpired, setTokenExpired] = useState();
+
+  const token = sessionStorage.getItem("jwtToken");
+  useEffect(() => {
+    if (token) {
+      setLoggedIn(true);
+    }
+  }, [token]);
 
   const handleScreenWidth = () => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -21,16 +27,21 @@ export const AppProvider = ({ children }) => {
 
   const handleHistory = async () => {
     const req = await fetch(
-      "http://localhost:5001/api/downloadHistory/INT0006"
+      "${endpoints.serverBaseUrl}/api/downloadHistory/INT0006"
     );
+
     const data = await req.json();
+    console.log(data);
+    
 
-    const  {Chrome} = data.downloadHistory.downloads[0];
-    const  {Firefox} = data.downloadHistory.downloads[0];
-    const  {Edge} = data.downloadHistory.downloads[0];
+    const { Chrome } = data.downloadHistory.downloads[0];
+    const { Firefox } = data.downloadHistory.downloads[0];
+    const { Edge } = data.downloadHistory.downloads[0];
 
-    console.log(Chrome, Firefox, Edge)
-    setDownloadHistory({Chrome, Firefox, Edge});
+    setDownloadHistory({ Chrome, Firefox, Edge });
+
+    
+    
   };
 
   useEffect(() => {
@@ -53,7 +64,7 @@ export const AppProvider = ({ children }) => {
         windowWidth,
         downloadHistory,
         tokenExpired,
-        setTokenExpired
+        setTokenExpired,
       }}
     >
       {children}

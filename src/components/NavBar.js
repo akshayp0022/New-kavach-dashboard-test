@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { RoundNameCircle } from "./Table/TableComponents";
 import { ListItem, ListItemIcon } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { useAppContext } from "./AppContext";
 import "../css/topNavBar.css";
+import { useAuth } from "../context/auth";
 
 function NavBar() {
   const { open, toggleDrawer } = useAppContext();
+  const { user } = useAuth();
+ 
+  
+  
   return (
     <div
       id="topnavbar"
@@ -38,7 +43,7 @@ function NavBar() {
       </ListItem>
 
       <div>
-        <RoundNameCircle name={"Super Admin"} status={"Activated"} />
+        <RoundNameCircle   name={user ? user.initials : "NA"} status={"Activated"} />
       </div>
     </div>
   );

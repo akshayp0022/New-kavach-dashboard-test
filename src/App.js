@@ -5,9 +5,7 @@ import "./css/App.css";
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <RoutesHandler />
-      </BrowserRouter>
+      <RoutesHandler />
     </>
   );
 }

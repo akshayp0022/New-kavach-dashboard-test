@@ -6,6 +6,7 @@ import {
   GroupAddOutlined as GroupAddOutlinedIcon,
   MoveToInbox as InboxIcon,
   Mail as MailIcon,
+  LogoutOutlined as LogoutOutlinedIcon,
 } from "@mui/icons-material";
 
 export const renderIcons = [
@@ -27,6 +28,7 @@ export const fourIconsCommonStyle = {
 export const activityIcons = [
   { text: "Members", data: <AccountCircleOutlinedIcon /> },
   { text: "Teams", data: <GroupAddOutlinedIcon /> },
+  { text: "Logout", data: <LogoutOutlinedIcon /> },
 ];
 
 export const NavlinkStyles = {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormGroup,
   FormControlLabel,
@@ -8,7 +8,7 @@ import {
   Box,
 } from "@mui/material";
 
-const FeatureSettings = ({  }) => {
+const FeatureSettings = ({ currentEmployee }) => {
   const toggleOptions = {
     usbPolicy: "Restrict Access To USB Setting",
     taskManager: "Restrict Access To Windows Task Manager",
@@ -16,15 +16,44 @@ const FeatureSettings = ({  }) => {
     systemSettings: "Restrict Access To System Settings",
     copyPaste: "Restrict Access To Copy & Paste",
     cameraSetting: "Restrict Access To Camera Setting",
-    internetAccess : "Restrict Access to Internet access",
-    gps : "Restrict Access to GPS",
+    internetAccess: "Restrict Access To Internet access",
+    gps: "Restrict Access to GPS",
   };
 
+ 
+
+  // Initialize the feature settings state based on currentEmployee
+  const [settings, setSettings] = useState({
+    usbPolicy: false,
+    taskManager: false,
+    rightClick: false,
+    systemSettings: false,
+    copyPaste: false,
+    cameraSetting: false,
+    internetAccess: false,
+    gps: false,
+  });
+
+  useEffect(() => {
+    if (currentEmployee?.featureSettings) {
+      setSettings({
+        usbPolicy: currentEmployee.featureSettings.usbPolicy || false,
+        taskManager: currentEmployee.featureSettings.taskManager || false,
+        rightClick: currentEmployee.featureSettings.rightClick || false,
+        systemSettings: currentEmployee.featureSettings.systemSettings || false,
+        copyPaste: currentEmployee.featureSettings.copyPaste || false,
+        cameraSetting: currentEmployee.featureSettings.cameraSetting || false,
+        internetAccess: currentEmployee.featureSettings.internetAccess || false,
+        gps: currentEmployee.featureSettings.gps || false,
+      });
+    }
+  }, [currentEmployee]);
+
   const handleToggle = (option) => {
-    // setSettings((prevSettings) => ({
-    //   ...prevSettings,
-    //   [option]: !prevSettings[option],
-    // }));
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      [option]: !prevSettings[option],
+    }));
   };
 
   return (
@@ -33,11 +62,11 @@ const FeatureSettings = ({  }) => {
         variant="h6"
         component="div"
         sx={{
-          mt: 0, 
-          mb:1,
-          textAlign: "center",
-          fontWeight: "bold", 
-            fontSize:'13px'
+          mt: 0,
+          mb: 1,
+          textAlign: "start",
+          fontWeight: "bold",
+          fontSize: "13px",
         }}
       >
         Enable the enhanced security option to provide extra protection for your rules and the filter.
@@ -48,22 +77,15 @@ const FeatureSettings = ({  }) => {
             <Grid item xs={12} key={option}>
               <Box
                 sx={{
-                  display: 'flex',
-
-                 justifyContent: 'space-between',
-
-                 
-                  justifyContent: 'space-between',
-
-                  alignItems: 'center',
-                  mb: 0, // Add margin between items
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 0,
                 }}
               >
-                <Typography variant="body2">
-                  {toggleOptions[option]}
-                </Typography>
+                <Typography variant="body2">{toggleOptions[option]}</Typography>
                 <Switch
-                //   checked={settings[option] || false}
+                  checked={settings[option]}
                   onChange={() => handleToggle(option)}
                   sx={{
                     "& .MuiSwitch-switchBase.Mui-checked": {

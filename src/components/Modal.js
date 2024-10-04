@@ -10,6 +10,8 @@ import ScreenShotData from "./ModalComponents/ScreenShotData";
 import WebsiteSetting from "./ModalComponents/WebsiteSetting";
 import InternetHistory from "./ModalComponents/InternetHistory";
 import DownloadHistory from "./ModalComponents/DownloadHistory";
+import Keylogger from "./ModalComponents/KeyLogger";
+import Wallpaper from "./ModalComponents/Wallpaper";
 
 const style = {
   position: "absolute",
@@ -44,15 +46,8 @@ export default function TransitionsModal() {
           },
         }}
       >
-        <Fade in={open}>
-          <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              Text in a modal
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
-          </Box>
+        <Fade in={open} id='hello_void'>
+          
         </Fade>
       </Modal>
     </div>
@@ -79,32 +74,44 @@ export const ModalContentTitle = ({ contentValue }) => {
     case "download_history":
       return <Typography variant="h4">Download History</Typography>;
 
+    case "keylogger_history":
+      return <Typography variant="h4">Keylogger History</Typography>;
+
+    case "wallpaper_settings": 
+      return <Typography variant="h4">Wallpaper Settings</Typography>;
+
     default:
       return <Typography variant="h4">Features Settings</Typography>;
   }
 };
 
-export const ModalContent = ({ contentValue }) => {
+export const ModalContent = ({ contentValue, currentEmployee }) => {
   switch (contentValue) {
     case "features_settings":
-      return <FeatureSettings />;
+      return <FeatureSettings currentEmployee={currentEmployee} />;
 
     case "forcefully_restart":
-      return <ForceFullyRestart />;
+      return <ForceFullyRestart currentEmployee={currentEmployee}/>;
 
     case "screenshot_email_data":
-      return <ScreenShotData />;
+      return <ScreenShotData currentEmployee={currentEmployee}/>;
 
     case "website_settings":
-      return <WebsiteSetting />;
+      return <WebsiteSetting currentEmployee={currentEmployee}/>;
 
     case "internet_history":
-      return <InternetHistory />;
+      return <InternetHistory currentEmployee={currentEmployee}/>;
 
     case "download_history":
-      return <DownloadHistory />;
+      return <DownloadHistory currentEmployee={currentEmployee}/>;
+
+    case "keylogger_history":
+      return <Keylogger currentEmployee={currentEmployee}/>;
+
+    case "wallpaper_settings": 
+      return <Wallpaper currentEmployee={currentEmployee}/>
 
     default:
-      return <FeatureSettings />;
+      return <FeatureSettings currentEmployee={currentEmployee} />;
   }
 };

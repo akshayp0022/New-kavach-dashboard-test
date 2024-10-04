@@ -62,19 +62,20 @@ export default function StickyHeadTable() {
   const handleChangeModalContent = (newValue) => {
     handleModalContent(newValue);
   };
-  // **************
+  
 
   const getData = async () => {
     try {
-      const data = await fetch("http://localhost:5000/api/users/get", {
+      const data = await fetch("http://localhost:4001/api/users/get", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("emp data: ",data);
       const parseData = await data.json();
-      console.log(parseData);
+      console.log("emp data: ",parseData);
       setRowsData(parseData.users);
     } catch (err) {
       console.log(err.message);

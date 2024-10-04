@@ -36,9 +36,9 @@ function CollapsibleSidebar() {
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  useEffect(() => {
-    console.log(open);
-  }, [open]);
+  // useEffect(() => {
+  //   console.log(open);
+  // }, [open]);
 
   return (
     <>

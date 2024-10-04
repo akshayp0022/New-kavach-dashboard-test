@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   TextField,
@@ -13,23 +13,27 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 
 import io from 'socket.io-client';
-import  { useState, useEffect } from 'react';
 
-
-const ForcefullyRestartSettings = ({ settings, setSettings,employeeId }) => {
-//   console.log("<<<id",employeeId);
-  
+const ForcefullyRestartSettings = ({ employeeId, currentEmployee }) => {
   const [socket, setSocket] = useState(null);
-  const [restartSettings, setRestartSettings] = React.useState({
-    enabled: settings?.forcefullyRestart?.enabled || false,
-    dayInterval: settings?.forcefullyRestart?.dayInterval || "1",
-    time: settings?.forcefullyRestart?.time ? dayjs(settings.forcefullyRestart.time, 'HH:mm') : dayjs(), // Adjusted for time picker
+  const [restartSettings, setRestartSettings] = useState({
+    enabled: false,
+    dayInterval: "1",
+    time: dayjs(),
   });
+
+  useEffect(() => {
+    if (currentEmployee?.featureSettings?.forcefullyRestart) {
+      setRestartSettings({
+        enabled: currentEmployee.featureSettings.forcefullyRestart.enabled || false,
+        dayInterval: currentEmployee.featureSettings.forcefullyRestart.dayInterval || "1",
+        time: currentEmployee.featureSettings.forcefullyRestart.time ? dayjs(currentEmployee.featureSettings.forcefullyRestart.time, 'HH:mm') : dayjs(),
+      });
+    }
+  }, [currentEmployee]);
 
   // Set up the socket connection on component mount
   useEffect(() => {
-    // console.log('Employee ID passed to component:', employeeId);
-    
     const newSocket = io('http://localhost:5001', {
       reconnection: true,
       reconnectionAttempts: 10,
@@ -40,14 +44,12 @@ const ForcefullyRestartSettings = ({ settings, setSettings,employeeId }) => {
       console.log('Connected to websocket');
     });
 
-
     newSocket.on('disconnect', () => {
       console.log('Disconnected from websocket');
     });
 
-    newSocket.on('intervalRestart', 
-      (...data) => {
-    //   console.log('Received restart configuration:', data.employeeId);
+    newSocket.on('intervalRestart', (...data) => {
+      console.log('Received restart configuration:', data);
     });
 
     setSocket(newSocket);
@@ -61,15 +63,15 @@ const ForcefullyRestartSettings = ({ settings, setSettings,employeeId }) => {
   useEffect(() => {
     if (socket && socket.connected) {
       console.log('Emitting restart settings with empId', employeeId);
-      
+
       socket.emit('restart', {
         employeeId,
         enabled: restartSettings.enabled,
         dayInterval: restartSettings.dayInterval,
-        time: restartSettings.time,
+        time: restartSettings.time.format('HH:mm'),
       });
-      console.log("Emitted data",employeeId);
-      
+
+      console.log("Emitted data", employeeId);
     }
   }, [restartSettings, socket, employeeId]);
 
@@ -99,13 +101,6 @@ const ForcefullyRestartSettings = ({ settings, setSettings,employeeId }) => {
     }));
   };
 
-//   React.useEffect(() => {
-//     setSettings((prevSettings) => ({
-//       ...prevSettings,
-//       forcefullyRestart: restartSettings,
-//     }));
-//   }, [restartSettings, setSettings]);
-
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container spacing={2} alignItems="center">
@@ -130,33 +125,32 @@ const ForcefullyRestartSettings = ({ settings, setSettings,employeeId }) => {
             }
           />
         </Grid>
-        {/* {restartSettings.enabled && ( */}
-          <>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Day Interval"
-                variant="outlined"
-                type="number"
-                value={restartSettings.dayInterval}
-                onChange={handleRestartChange("dayInterval")}
-                inputProps={{ min: 1 }}
+
+        <>
+          <Grid item xs={6}>
+            <TextField
+              fullWidth
+              label="Day Interval"
+              variant="outlined"
+              type="number"
+              value={restartSettings.dayInterval}
+              onChange={handleRestartChange("dayInterval")}
+              inputProps={{ min: 1 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <MobileTimePicker
+                label="Time"
+                value={dayjs(restartSettings.time, 'HH:mm')}
+                onChange={handleTimeChange}
+                openTo="minutes"
+                views={['hours', 'minutes']}
+                format="HH:mm"
               />
-            </Grid>
-            <Grid item xs={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                  label="Time"
-                  value={dayjs(restartSettings.time, 'HH:mm')} // Ensure the picker receives a dayjs object
-                  onChange={handleTimeChange}
-                  openTo="minutes"
-                  views={['hours', 'minutes']}
-                  format="HH:mm" // Display time in 24-hour format
-                />
-              </LocalizationProvider>
-            </Grid>
-          </>
-        {/* )} */}
+            </LocalizationProvider>
+          </Grid>
+        </>
       </Grid>
     </Box>
   );

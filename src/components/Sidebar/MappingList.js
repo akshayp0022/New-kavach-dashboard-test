@@ -1,9 +1,21 @@
-import { ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { CommonListItemStyle, StyledNavLinkCSS } from "./Data";
 import { renderIcons, activityIcons } from "./Data";
 import { StyledNavLink } from "../SideBar";
+import { useAuth } from "../../context/auth";
 
 const MappingList = () => {
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <>
       {renderIcons.map((value) => {
@@ -30,21 +42,34 @@ const MappingList = () => {
       </ListItem>
 
       {activityIcons.map((value) => {
-        return (
-          <StyledNavLink
-            key={value.text}
-            to={`/${value.text.toLowerCase()}`}
-            style={StyledNavLinkCSS}
-          >
-            <ListItem sx={CommonListItemStyle}>
+        if (value.text === "Logout") {
+          return (
+            <ListItem
+              key={value.text}
+              sx={CommonListItemStyle}
+              onClick={handleLogout} // Call handleLogout when clicked
+            >
               <ListItemIcon>{value.data}</ListItemIcon>
               <ListItemText primary={value.text} />
             </ListItem>
-          </StyledNavLink>
-        );
+          );
+        } else {
+          return (
+            <StyledNavLink
+              key={value.text}
+              to={`/${value.text.toLowerCase()}`}
+              style={StyledNavLinkCSS}
+            >
+              <ListItem sx={CommonListItemStyle}>
+                <ListItemIcon>{value.data}</ListItemIcon>
+                <ListItemText primary={value.text} />
+              </ListItem>
+            </StyledNavLink>
+          );
+        }
       })}
     </>
   );
 };
 
-export default MappingList
+export default MappingList;

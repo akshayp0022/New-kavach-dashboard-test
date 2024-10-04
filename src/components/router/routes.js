@@ -4,12 +4,11 @@ import { Routes, Route } from "react-router-dom";
 import C1 from "../Component1";
 import StickyHeadTable from "../OldTable";
 import Login from "../Login";
-import { useAppContext } from "../AppContext";
 import ProtectedRoutes from "./ProtectedRoutes";
 import DataTable from "../DataTable";
+import EmpTable from "../EmpTable";
 
 function RoutesHandler() {
-  const { isLoggedIn } = useAppContext();
   return (
     <div>
       <Routes>
@@ -23,8 +22,8 @@ function RoutesHandler() {
             <Route path='/attendence' element={<C1 pageName={'Attendence'}/>}/>
             <Route path='/mail' element={<C1 pageName={'Mail'}/>}/>
             <Route path='/inbox' element={<C1 pageName={'Inbox'}/>}/>
-            <Route path='/members' element={<StickyHeadTable />}/>
-            <Route path='/teams' element={<DataTable />}/>
+            <Route path='/members' element={<C1 pageName={'Members'} />}/>
+            <Route path='/teams' element={<EmpTable />}/>
           </Route>
         </Route>        
       </Routes>

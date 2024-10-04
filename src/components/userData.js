@@ -1,1 +1,1 @@
-export const token = sessionStorage.getItem('jwtToken') || undefined;
+export const token = sessionStorage.getItem('token') || undefined;
