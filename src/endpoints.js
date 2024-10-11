@@ -1,5 +1,5 @@
  const endpoints = {
-    serverBaseUrl: "http://localhost:4001",
+    serverBaseUrl: "http://localhost:5001",
 }
 
 export default endpoints

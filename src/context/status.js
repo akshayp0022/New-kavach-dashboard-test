@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { useAuth } from "./auth";
+import {ws} from "../utils/endpoints"
+
 
 const StatusContext = createContext();
 
@@ -11,7 +13,7 @@ export const StatusProvider = ({ children }) => {
 
   useEffect(() => {
     if (token && !socketRef.current) {
-      socketRef.current = io("http://10.0.0.31:5001", {
+      socketRef.current = io(ws, {
         transports: ["websocket"],  
         reconnection: true,         
         reconnectionAttempts: 5,    

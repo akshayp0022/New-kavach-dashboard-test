@@ -2,7 +2,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
-import { Text_Icon } from "./TableComponents";
+import { TextIcon } from "./TableComponents";
 
 let currentWindowWidth = window.innerWidth;
 window.addEventListener('resize', () => {
@@ -19,19 +19,20 @@ export const moreHorizStyles = {
 export const modalList = [
   "Features Settings",
   "Forcefully Restart",
-  "Screenshot email Data",
+  "Screenshot",
   "Website Settings",
   "Internet History",
   "Download History",
   'Keylogger History',
-  'Wallpaper Settings'
+  'Wallpaper Settings',
+  'Audio Recording',
 ];
 
 export const columns = [
   {
     id: "name",
     label: (
-      <Text_Icon
+      <TextIcon
         text={"Name"}
         Icon={<AccountCircleIcon sx={{ color: "#6754E2" }} />}
       />
@@ -41,7 +42,7 @@ export const columns = [
   {
     id: "employee_id",
     label: (
-      <Text_Icon
+      <TextIcon
         text={"Employee Id"}
         Icon={<BadgeOutlinedIcon sx={{ color: "#6754E2" }} />}
       />
@@ -52,7 +53,7 @@ export const columns = [
   {
     id: "status",
     label: (
-      <Text_Icon
+      <TextIcon
         text={"Status"}
         Icon={<CheckCircleOutlineIcon sx={{ color: "#6754E2" }} />}
       />
@@ -63,7 +64,7 @@ export const columns = [
   {
     id: "action",
     label: (
-      <Text_Icon
+      <TextIcon
         text={"Action"}
         Icon={<SettingsSuggestOutlinedIcon sx={{ color: "#6754E2" }} />}
       />

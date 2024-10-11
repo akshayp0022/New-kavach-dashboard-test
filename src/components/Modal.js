@@ -1,6 +1,5 @@
 import * as React from "react";
 import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
@@ -12,6 +11,7 @@ import InternetHistory from "./ModalComponents/InternetHistory";
 import DownloadHistory from "./ModalComponents/DownloadHistory";
 import Keylogger from "./ModalComponents/KeyLogger";
 import Wallpaper from "./ModalComponents/Wallpaper";
+import Records from "./ModalComponents/Records";
 
 const style = {
   position: "absolute",
@@ -28,7 +28,10 @@ const style = {
 export default function TransitionsModal() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
 
   return (
     <div>
@@ -46,8 +49,11 @@ export default function TransitionsModal() {
           },
         }}
       >
-        <Fade in={open} id='hello_void'>
-          
+        <Fade in={open} id="hello_void">
+          <div>
+            <h2 id="transition-modal-title">Modal Title</h2>
+            <p id="transition-modal-description">Your content here...</p>
+          </div>
         </Fade>
       </Modal>
     </div>
@@ -62,8 +68,8 @@ export const ModalContentTitle = ({ contentValue }) => {
     case "forcefully_restart":
       return <Typography variant="h4">Forcefully Restart</Typography>;
 
-    case "screenshot_email_data":
-      return <Typography variant="h4">Screenshot and Email Data</Typography>;
+    case "screenshot":
+      return <Typography variant="h4">Screenshot</Typography>;
 
     case "website_settings":
       return <Typography variant="h4">Website Settings</Typography>;
@@ -77,8 +83,11 @@ export const ModalContentTitle = ({ contentValue }) => {
     case "keylogger_history":
       return <Typography variant="h4">Keylogger History</Typography>;
 
-    case "wallpaper_settings": 
+    case "wallpaper_settings":
       return <Typography variant="h4">Wallpaper Settings</Typography>;
+
+    case "audio_recording":
+      return <Typography variant="h4">Record Settings</Typography>;
 
     default:
       return <Typography variant="h4">Features Settings</Typography>;
@@ -91,25 +100,28 @@ export const ModalContent = ({ contentValue, currentEmployee }) => {
       return <FeatureSettings currentEmployee={currentEmployee} />;
 
     case "forcefully_restart":
-      return <ForceFullyRestart currentEmployee={currentEmployee}/>;
+      return <ForceFullyRestart currentEmployee={currentEmployee} />;
 
-    case "screenshot_email_data":
-      return <ScreenShotData currentEmployee={currentEmployee}/>;
+    case "screenshot":
+      return <ScreenShotData currentEmployee={currentEmployee} />;
 
     case "website_settings":
-      return <WebsiteSetting currentEmployee={currentEmployee}/>;
+      return <WebsiteSetting currentEmployee={currentEmployee} />;
 
     case "internet_history":
-      return <InternetHistory currentEmployee={currentEmployee}/>;
+      return <InternetHistory currentEmployee={currentEmployee} />;
 
     case "download_history":
-      return <DownloadHistory currentEmployee={currentEmployee}/>;
+      return <DownloadHistory currentEmployee={currentEmployee} />;
 
     case "keylogger_history":
-      return <Keylogger currentEmployee={currentEmployee}/>;
+      return <Keylogger currentEmployee={currentEmployee} />;
 
-    case "wallpaper_settings": 
-      return <Wallpaper currentEmployee={currentEmployee}/>
+    case "wallpaper_settings":
+      return <Wallpaper currentEmployee={currentEmployee} />;
+
+    case "audio_recording":
+      return <Records currentEmployee={currentEmployee} />;
 
     default:
       return <FeatureSettings currentEmployee={currentEmployee} />;

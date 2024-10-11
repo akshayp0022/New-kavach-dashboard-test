@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "../utils/index";
-import { useAuth } from "../context/auth";
+import axios from "../utils/endpoints";
 
 const EmployeeContext = createContext();
 
@@ -9,11 +8,10 @@ export const useEmployeeContext = () => {
 };
 
 export const EmployeeProvider = ({ children }) => {
-  const { token } = useAuth();
+  const token = sessionStorage.getItem("token");
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   const fetchEmployees = async () => {
     try {
@@ -24,8 +22,8 @@ export const EmployeeProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
-      setEmployees(response.data.data );
+
+      setEmployees(response.data.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
       setError(error);
@@ -36,12 +34,13 @@ export const EmployeeProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
+      console.log("token exists",);
       fetchEmployees();
     }
   }, [token]);
 
   return (
-    <EmployeeContext.Provider value={{ employees, loading, error }}>
+    <EmployeeContext.Provider value={{ employees, loading, error,  }}>
       {children}
     </EmployeeContext.Provider>
   );

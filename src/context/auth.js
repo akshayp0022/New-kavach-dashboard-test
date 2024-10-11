@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../utils/index";
+import axios from "../utils/endpoints";
 
 export const AuthContext = createContext({
   user: null,
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   console.log("user: ", user);
-  
+
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    setUser(null)
+    setUser(null);
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
     navigate("/login");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { RoundNameCircle } from "./Table/TableComponents";
 import { ListItem, ListItemIcon } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
@@ -9,9 +9,7 @@ import { useAuth } from "../context/auth";
 function NavBar() {
   const { open, toggleDrawer } = useAppContext();
   const { user } = useAuth();
- 
-  
-  
+
   return (
     <div
       id="topnavbar"
@@ -43,7 +41,10 @@ function NavBar() {
       </ListItem>
 
       <div>
-        <RoundNameCircle   name={user ? user.initials : "NA"} status={"Activated"} />
+        <RoundNameCircle
+          name={user ? user.initials : "NA"}
+          status={"Activated"}
+        />
       </div>
     </div>
   );

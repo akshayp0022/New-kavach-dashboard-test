@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
   FormGroup,
-  FormControlLabel,
   Switch,
   Grid,
   Typography,
   Box,
 } from "@mui/material";
+import axios from "../../utils/endpoints";
 
 const FeatureSettings = ({ currentEmployee }) => {
   const toggleOptions = {
@@ -20,9 +20,8 @@ const FeatureSettings = ({ currentEmployee }) => {
     gps: "Restrict Access to GPS",
   };
 
- 
+  const token = sessionStorage.getItem("token") || undefined;
 
-  // Initialize the feature settings state based on currentEmployee
   const [settings, setSettings] = useState({
     usbPolicy: false,
     taskManager: false,
@@ -49,11 +48,33 @@ const FeatureSettings = ({ currentEmployee }) => {
     }
   }, [currentEmployee]);
 
-  const handleToggle = (option) => {
+  const handleToggle = async (option) => {
+    const newValue = !settings[option]; 
+
     setSettings((prevSettings) => ({
       ...prevSettings,
-      [option]: !prevSettings[option],
+      [option]: newValue,
     }));
+
+    try {
+      await axios.put(
+        `/features/${currentEmployee.employeeId}`,
+        {
+          [option]: newValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error updating feature settings:", error);
+      setSettings((prevSettings) => ({
+        ...prevSettings,
+        [option]: !newValue,
+      }));
+    }
   };
 
   return (
@@ -69,7 +90,8 @@ const FeatureSettings = ({ currentEmployee }) => {
           fontSize: "13px",
         }}
       >
-        Enable the enhanced security option to provide extra protection for your rules and the filter.
+        Enable the enhanced security option to provide extra protection for your
+        rules and the filter.
       </Typography>
       <FormGroup>
         <Grid container spacing={1}>

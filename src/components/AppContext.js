@@ -32,16 +32,12 @@ export const AppProvider = ({ children }) => {
 
     const data = await req.json();
     console.log(data);
-    
 
     const { Chrome } = data.downloadHistory.downloads[0];
     const { Firefox } = data.downloadHistory.downloads[0];
     const { Edge } = data.downloadHistory.downloads[0];
 
     setDownloadHistory({ Chrome, Firefox, Edge });
-
-    
-    
   };
 
   useEffect(() => {

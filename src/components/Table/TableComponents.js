@@ -1,6 +1,6 @@
 import { Badge, Typography } from "@mui/material";
 
-export const Text_Icon = ({ text, Icon }) => {
+export const TextIcon = ({ text, Icon }) => {
   return (
     <div
       style={{

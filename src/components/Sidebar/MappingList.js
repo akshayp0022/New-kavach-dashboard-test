@@ -47,7 +47,7 @@ const MappingList = () => {
             <ListItem
               key={value.text}
               sx={CommonListItemStyle}
-              onClick={handleLogout} // Call handleLogout when clicked
+              onClick={handleLogout}
             >
               <ListItemIcon>{value.data}</ListItemIcon>
               <ListItemText primary={value.text} />

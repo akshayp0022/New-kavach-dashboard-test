@@ -12,6 +12,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { useStatus } from "../context/status";
 
 const EmployeeModal = ({
   open,
@@ -25,9 +26,12 @@ const EmployeeModal = ({
   activeItem,
   setActiveItem,
 }) => {
+  const { statusData } = useStatus();
   const currentEmployee = employees.find(
     (emp) => emp.employeeId === currentEmployeeId
   );
+
+  const employeeStatus = statusData[currentEmployeeId]?.status || "deactivated";
 
   return (
     <>
@@ -42,8 +46,7 @@ const EmployeeModal = ({
                       .find((emp) => emp.employeeId === currentEmployeeId)
                       ?.name.trim() || "N/A"
                   }
-                  // Need to make dynamic ********
-                  status={"active"}
+                  status={employeeStatus}
                 />
               </Typography>
               <Typography id="employeeId">{currentEmployeeId}</Typography>

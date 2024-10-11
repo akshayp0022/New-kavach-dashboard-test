@@ -1,55 +1,53 @@
-import React, { useState, useEffect } from "react";
-import {
-  Grid,
-  TextField,
-  FormControlLabel,
-  Switch,
-  Typography,
-  Box,
-} from "@mui/material";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
+import React, { useEffect, useState } from 'react';
+import { Box, Grid, Typography, Button, TextField } from '@mui/material';
+import { MobileTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-
 import io from 'socket.io-client';
+import { ws } from "../../utils/endpoints";
+import { useStatus } from '../../context/status';
 
-const ForcefullyRestartSettings = ({ employeeId, currentEmployee }) => {
+const ForcefullyRestartSettings = ({ currentEmployee }) => {
   const [socket, setSocket] = useState(null);
   const [restartSettings, setRestartSettings] = useState({
     enabled: false,
     dayInterval: "1",
     time: dayjs(),
   });
-
+  
+  const { statusData } = useStatus();
+  const employeeStatus = statusData[currentEmployee.employeeId]?.status || "deactivated";
+  
+  const showUI = employeeStatus === "active" || employeeStatus === "idle";
+  
   useEffect(() => {
     if (currentEmployee?.featureSettings?.forcefullyRestart) {
+      const settings = currentEmployee.featureSettings.forcefullyRestart;
       setRestartSettings({
-        enabled: currentEmployee.featureSettings.forcefullyRestart.enabled || false,
-        dayInterval: currentEmployee.featureSettings.forcefullyRestart.dayInterval || "1",
-        time: currentEmployee.featureSettings.forcefullyRestart.time ? dayjs(currentEmployee.featureSettings.forcefullyRestart.time, 'HH:mm') : dayjs(),
+        enabled: settings.enabled ,
+        dayInterval: settings.dayInterval || 1,
+        time: settings.time ? dayjs(settings.time, "HH:mm") : dayjs(),
       });
     }
   }, [currentEmployee]);
 
-  // Set up the socket connection on component mount
   useEffect(() => {
-    const newSocket = io('http://localhost:5001', {
+    const newSocket = io(ws, {
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 2000,
     });
 
-    newSocket.on('connect', () => {
-      console.log('Connected to websocket');
+    newSocket.on("connect", () => {
+      console.log("Connected to websocket");
     });
 
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from websocket');
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from websocket");
     });
 
-    newSocket.on('intervalRestart', (...data) => {
-      console.log('Received restart configuration:', data);
+    newSocket.on("intervalRestart", (...data) => {
+      console.log("Received restart configuration:", data);
     });
 
     setSocket(newSocket);
@@ -57,35 +55,31 @@ const ForcefullyRestartSettings = ({ employeeId, currentEmployee }) => {
     return () => {
       newSocket.close();
     };
-  }, [employeeId]);
+  }, []);
 
-  // Emit restart settings when they change, only if the socket is connected
-  useEffect(() => {
+  const handleSaveSettings = () => {
     if (socket && socket.connected) {
-      console.log('Emitting restart settings with empId', employeeId);
-
-      socket.emit('restart', {
-        employeeId,
+      console.log("Emitting restart settings with empId", currentEmployee?.employeeId || "NA");
+      socket.emit("restart", {
+        employeeId: currentEmployee?.employeeId || null,
         enabled: restartSettings.enabled,
-        dayInterval: restartSettings.dayInterval,
-        time: restartSettings.time.format('HH:mm'),
+        dayInterval: Number(restartSettings.dayInterval),
+        time: restartSettings.time.format("HH:mm"),
       });
 
-      console.log("Emitted data", employeeId);
+      console.log("Emitted data", {
+        employeeId: currentEmployee?.employeeId,
+        enabled: restartSettings.enabled,
+        dayInterval: restartSettings.dayInterval,
+        time: restartSettings.time.format("HH:mm"),
+      });
     }
-  }, [restartSettings, socket, employeeId]);
-
-  const handleRestartToggle = () => {
-    setRestartSettings((prevSettings) => ({
-      ...prevSettings,
-      enabled: !prevSettings.enabled,
-    }));
   };
 
   const handleRestartChange = (field) => (event) => {
     let value = event.target.value;
     if (field === "dayInterval") {
-      value = Math.max(1, parseInt(value, 10) || 1); // Ensure value is at least 1
+      value = Math.max(1, parseInt(value, 10) || 1);
     }
     setRestartSettings((prevSettings) => ({
       ...prevSettings,
@@ -94,63 +88,57 @@ const ForcefullyRestartSettings = ({ employeeId, currentEmployee }) => {
   };
 
   const handleTimeChange = (newValue) => {
-    const formattedTime = dayjs(newValue).format('HH:mm'); // Format to HH:mm
     setRestartSettings((prevSettings) => ({
       ...prevSettings,
-      time: formattedTime,
+      time: dayjs(newValue),
     }));
   };
+
+  if (!showUI) {
+    return <Typography variant="h6">Employee is not active or idle.</Typography>;
+  }
 
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={6}>
-          <Typography variant="h6">Enable To Set Settings</Typography>
+        <Grid item xs={12}>
+          <Typography variant="h6">Forcefully Restart Settings</Typography>
         </Grid>
-        <Grid item xs={12} sm={6} container justifyContent="flex-end">
-          <FormControlLabel
-            control={
-              <Switch
-                checked={restartSettings.enabled}
-                onChange={handleRestartToggle}
-                sx={{
-                  "& .MuiSwitch-switchBase.Mui-checked": {
-                    color: "#2689ff",
-                  },
-                  "& .MuiSwitch-track": {
-                    backgroundColor: "#b0d1d1",
-                  },
-                }}
-              />
-            }
+
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            label="Day Interval"
+            variant="outlined"
+            type="number"
+            value={restartSettings.dayInterval}
+            onChange={handleRestartChange("dayInterval")}
+            inputProps={{ min: 1 }}
           />
         </Grid>
 
-        <>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Day Interval"
-              variant="outlined"
-              type="number"
-              value={restartSettings.dayInterval}
-              onChange={handleRestartChange("dayInterval")}
-              inputProps={{ min: 1 }}
+        <Grid item xs={6}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileTimePicker
+              label="Time"
+              value={restartSettings.time}
+              onChange={handleTimeChange}
+              openTo="minutes"
+              views={["hours", "minutes"]}
+              format="HH:mm"
             />
-          </Grid>
-          <Grid item xs={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <MobileTimePicker
-                label="Time"
-                value={dayjs(restartSettings.time, 'HH:mm')}
-                onChange={handleTimeChange}
-                openTo="minutes"
-                views={['hours', 'minutes']}
-                format="HH:mm"
-              />
-            </LocalizationProvider>
-          </Grid>
-        </>
+          </LocalizationProvider>
+        </Grid>
+
+        <Grid item xs={12} container justifyContent="flex-end">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveSettings}
+          >
+            Save
+          </Button>
+        </Grid>
       </Grid>
     </Box>
   );

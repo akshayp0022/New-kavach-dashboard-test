@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Box,
   Drawer,
@@ -30,15 +30,12 @@ import NavBar from "./NavBar";
 import "../css/customs.css";
 
 export const StyledNavLink = styled(NavLink)(() => NavlinkStyles);
+
 function CollapsibleSidebar() {
   const theme = useTheme();
   const { open, toggleDrawer } = useAppContext();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  // useEffect(() => {
-  //   console.log(open);
-  // }, [open]);
 
   return (
     <>

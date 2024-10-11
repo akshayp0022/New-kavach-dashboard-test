@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { Box, Container, Grid, List, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  Container,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import io from "socket.io-client";
+import { ws } from "../../utils/endpoints";
 
 const DownloadHistoryList = ({ downloadHistory }) => {
   const { Chrome, FireFox, Edge } = downloadHistory;
@@ -17,21 +25,24 @@ const DownloadHistoryList = ({ downloadHistory }) => {
               sx={{ display: "block", textAlign: "justify" }}
               fontSize={18}
             >
-              <b>Link: </b>{value[1]}
+              <b>Link: </b>
+              {value[1]}
             </Typography>
             <Typography
               variant="p"
               sx={{ display: "block", textAlign: "justify" }}
               fontSize={18}
             >
-              <b>Device: </b>{value[0]}
+              <b>Device: </b>
+              {value[0]}
             </Typography>
             <Typography
               variant="p"
               sx={{ display: "block", textAlign: "justify" }}
               fontSize={18}
             >
-              <b>Date and Time: </b>{value[4]}
+              <b>Date and Time: </b>
+              {value[4]}
             </Typography>
           </ListItemText>
         </ListItem>
@@ -41,15 +52,22 @@ const DownloadHistoryList = ({ downloadHistory }) => {
 };
 
 const DownloadHistory = ({ currentEmployee }) => {
-  const [downloadHistory, setDownloadHistory] = useState({ Chrome: [], FireFox: [], Edge: [] });
+  const [downloadHistory, setDownloadHistory] = useState({
+    Chrome: [],
+    FireFox: [],
+    Edge: [],
+  });
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [socket, setSocket] = useState(null);
+
+  console.log(currentEmployee.employeeId);
 
   useEffect(() => {
     if (currentEmployee?.employeeId) {
       setSelectedEmployee(currentEmployee.employeeId);
+      console.log("Selected employee:", currentEmployee.employeeId);
 
-      const newSocket = io("http://10.0.0.31:5001", {
+      const newSocket = io(ws, {
         transports: ["websocket"],
         reconnection: true,
         reconnectionAttempts: 10,
@@ -59,7 +77,6 @@ const DownloadHistory = ({ currentEmployee }) => {
       newSocket.on("connect", () => {
         console.log("Connected to WebSocket");
 
-        
         if (currentEmployee?.employeeId) {
           newSocket.emit("getDownloadHistory", currentEmployee.employeeId);
         }
@@ -113,7 +130,14 @@ const DownloadHistory = ({ currentEmployee }) => {
                 width={450}
                 xAxis={[
                   {
-                    data: ["Google", "Youtube", "Gmail", "W.Web", "Instagram", "LinkedIn"],
+                    data: [
+                      "Google",
+                      "Youtube",
+                      "Gmail",
+                      "W.Web",
+                      "Instagram",
+                      "LinkedIn",
+                    ],
                     scaleType: "band",
                   },
                 ]}
@@ -149,7 +173,5 @@ const DownloadHistory = ({ currentEmployee }) => {
     </>
   );
 };
-
-
 
 export default DownloadHistory;

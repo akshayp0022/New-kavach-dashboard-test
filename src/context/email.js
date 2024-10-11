@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import axios from "../utils/index";
+import axios from "../utils/endpoints";
 import { useAuth } from "../context/auth";
 
 const EmailContext = createContext();

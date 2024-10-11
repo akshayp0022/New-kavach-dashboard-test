@@ -1,19 +1,7 @@
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import {
-  Container,
-  Typography,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { Container, Typography, TextField } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
@@ -23,9 +11,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
-import { Text_Icon } from "./Table/TableComponents";
+import { TextIcon } from "./Table/TableComponents";
 import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
-import TransitionsModal, { ModalContent, ModalContentTitle } from "./Modal";
+import TransitionsModal from "./Modal";
 import { useAppContext } from "./AppContext";
 import { useEmployeeContext } from "../context/employee";
 import "../css/Modal.css";
@@ -52,18 +40,15 @@ const EmpTable = () => {
   const [modalContent, handleModalContent] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
 
-  // State to track the current employeeId
   const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
 
-  const handleChangePage = (event, newPage) => setPage(newPage);
+  const handleChangePage = (newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-
   const handleClickOpen = (employeeId) => {
-    console.log(`Employee ID: ${employeeId}`);
     setCurrentEmployeeId(employeeId);
     setOpen(true);
   };
@@ -76,10 +61,10 @@ const EmpTable = () => {
     handleModalContent(newValue);
   };
 
-  const rowsData = employees.map(({ name, _id, employeeId, status  }, index) => {
-    const employeeStatus = statusData[employeeId]?.status || "deactivated" // Default to "Unknown" if status not found
-   console.log(employeeStatus);
-   
+  const rowsData = employees.map(({ name, _id, employeeId, status }, index) => {
+    const employeeStatus = statusData[employeeId]?.status || "deactivated";
+    console.log(employeeStatus);
+
     //TODO: Add employee status
     //TODO:  add status in the params along with name and id
     return {
@@ -87,7 +72,8 @@ const EmpTable = () => {
       status: <BadgeIcon status={employeeStatus} />,
       name: (
         <div>
-          <RoundNameCircle name={name.trim()} status={employeeStatus} /> {employeeId}
+          <RoundNameCircle name={(name || "").trim()} status={employeeStatus} />{" "}
+          {employeeId}
         </div>
       ),
       action: (
@@ -96,7 +82,7 @@ const EmpTable = () => {
           onClick={(e) => {
             e.stopPropagation();
             handleClickOpen(employeeId);
-          }} // Pass the employeeId here
+          }}
         />
       ),
       employeeId,
@@ -107,7 +93,7 @@ const EmpTable = () => {
     {
       field: "id",
       renderHeader: () => (
-        <Text_Icon
+        <TextIcon
           text={"No."}
           Icon={<NumbersOutlinedIcon sx={{ color: "#6754E2" }} />}
         />
@@ -118,7 +104,7 @@ const EmpTable = () => {
     {
       field: "name",
       renderHeader: () => (
-        <Text_Icon
+        <TextIcon
           text={"Name"}
           Icon={<AccountCircleIcon sx={{ color: "#6754E2" }} />}
         />
@@ -134,7 +120,7 @@ const EmpTable = () => {
     {
       field: "employeeId",
       renderHeader: () => (
-        <Text_Icon
+        <TextIcon
           text={"Employee Id"}
           Icon={<BadgeOutlinedIcon sx={{ color: "#6754E2" }} />}
         />
@@ -149,7 +135,7 @@ const EmpTable = () => {
     {
       field: "status",
       renderHeader: () => (
-        <Text_Icon
+        <TextIcon
           text={"Status"}
           Icon={<CheckCircleOutlineIcon sx={{ color: "#6754E2" }} />}
         />
@@ -165,7 +151,7 @@ const EmpTable = () => {
     {
       field: "action",
       renderHeader: () => (
-        <Text_Icon
+        <TextIcon
           text={"Action"}
           Icon={<SettingsSuggestOutlinedIcon sx={{ color: "#6754E2" }} />}
         />

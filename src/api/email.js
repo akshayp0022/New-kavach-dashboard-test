@@ -1,4 +1,4 @@
-import axios from "../utils/index";
+import axios from "../utils/endpoints";
 
 const token = sessionStorage.getItem("token") || undefined;
 

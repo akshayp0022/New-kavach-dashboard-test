@@ -9,10 +9,15 @@ import {
   Button,
 } from "@mui/material";
 import io from "socket.io-client";
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { ws } from "../../utils/endpoints"
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const InternetHistory = ({ currentEmployee }) => {
   const [browserHistory, setBrowserHistory] = useState([]);
   const [error, setError] = useState(null);
+  const [chartData, setChartData] = useState({ labels: [], dataCounts: [] });
   const socketRef = useRef(null);
 
   const handleGetBrowserHistory = () => {
@@ -29,7 +34,7 @@ const InternetHistory = ({ currentEmployee }) => {
 
   useEffect(() => {
     if (!socketRef.current) {
-      socketRef.current = io("http://10.0.0.31:5001", {
+      socketRef.current = io(ws, {
         transports: ["websocket"],
         reconnection: true,
         reconnectionAttempts: 10,
@@ -39,7 +44,6 @@ const InternetHistory = ({ currentEmployee }) => {
       socketRef.current.on("connect", () => {
         console.log("Connected to WebSocket");
 
-        // Automatically fetch browser history once connected and employee is available
         if (currentEmployee?.employeeId) {
           handleGetBrowserHistory();
         }
@@ -51,13 +55,11 @@ const InternetHistory = ({ currentEmployee }) => {
 
       socketRef.current.on("sendBrowserHistory", (data) => {
         if (data.error) {
-          // Handle error, such as 'Employee not connected'
           setError(data.error);
           setBrowserHistory([]);
         } else if (data && data.employeeId) {
           console.log("Received data from server:", data);
 
-          // Only proceed if there's valid history data and employee is connected
           if (
             String(data.employeeId).trim() ===
             String(currentEmployee?.employeeId).trim()
@@ -76,7 +78,7 @@ const InternetHistory = ({ currentEmployee }) => {
                 ...(data.data.Firefox || []),
               ];
               setBrowserHistory(combinedHistory);
-              setError(null); // Clear error if history is fetched successfully
+              setError(null);
             } else {
               console.log("No valid browser history data.");
               setBrowserHistory([]);
@@ -96,7 +98,7 @@ const InternetHistory = ({ currentEmployee }) => {
     }
 
     if (currentEmployee?.employeeId) {
-      handleGetBrowserHistory(); 
+      handleGetBrowserHistory();
     }
 
     return () => {
@@ -108,6 +110,18 @@ const InternetHistory = ({ currentEmployee }) => {
     };
   }, [currentEmployee]);
 
+  useEffect(() => {
+    if (browserHistory.length > 0) {
+      const labels = browserHistory.map(item => item.url);
+      const dataCounts = browserHistory.map(item => item.visit_count);
+
+      setChartData({
+        labels,
+        dataCounts,
+      });
+    }
+  }, [browserHistory]);
+
   return (
     <div>
       {error ? (
@@ -117,9 +131,10 @@ const InternetHistory = ({ currentEmployee }) => {
       ) : (
         <div>
           <Typography variant="h6">
-            Browser History for Employee {currentEmployee?.employeeId || "Unknown"}
+            Browser History for Employee{" "}
+            {currentEmployee?.employeeId || "Unknown"}
           </Typography>
-  
+
           {/* Display browser history */}
           <div>
             {browserHistory.length > 0 ? (
@@ -152,11 +167,34 @@ const InternetHistory = ({ currentEmployee }) => {
               <Typography>No browser history available.</Typography>
             )}
           </div>
+
+          {/* Display browser history chart */}
+          <div>
+                <Bar
+              data={{
+                labels: chartData.labels,
+                datasets: [{
+                  label: 'Visit Count',
+                  data: chartData.dataCounts,
+                  backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1,
+                }],
+              }}
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          </div>
         </div>
       )}
     </div>
   );
-  
 };
 
 export default InternetHistory;

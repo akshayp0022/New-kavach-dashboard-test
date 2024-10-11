@@ -2,10 +2,8 @@ import React from "react";
 import AllNavigationBar from "../SideBar";
 import { Routes, Route } from "react-router-dom";
 import C1 from "../Component1";
-import StickyHeadTable from "../OldTable";
 import Login from "../Login";
 import ProtectedRoutes from "./ProtectedRoutes";
-import DataTable from "../DataTable";
 import EmpTable from "../EmpTable";
 
 function RoutesHandler() {

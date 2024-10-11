@@ -66,7 +66,7 @@ export default function StickyHeadTable() {
 
   const getData = async () => {
     try {
-      const data = await fetch("http://localhost:4001/api/users/get", {
+      const data = await fetch("http://localhost:5001/api/users/get", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
