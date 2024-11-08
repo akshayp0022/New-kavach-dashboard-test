@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Security, Shield } from "@mui/icons-material";
 import { Box, Container, Typography, Input } from "@mui/material";
-import InputFields from "./SignUp/Input";
 import "../css/AuthPages.css";
-import Login from "./auth/Login"
+import Login from "./auth/Login";
 
 const SignUpPage = () => {
   return (
@@ -21,8 +20,7 @@ const SignUpPage = () => {
           Log in to your Account
         </Typography>
         <Typography>Welcome back! Enter your credentials to login:</Typography>
-        {/* <InputFields /> */}
-        <Login/>
+        <Login />
       </Box>
 
       <Box id="imageContainer">

@@ -10,6 +10,7 @@ import {
 } from "@mui/icons-material";
 
 export const renderIcons = [
+  { text: "Teams", data: <GroupAddOutlinedIcon /> },
   { text: "Screenshot", data: <ScreenshotMonitorOutlinedIcon /> },
   { text: "Apps", data: <AppsOutlinedIcon /> },
   { text: "Attendence", data: <CalendarMonthOutlinedIcon /> },
@@ -27,7 +28,6 @@ export const fourIconsCommonStyle = {
 
 export const activityIcons = [
   { text: "Members", data: <AccountCircleOutlinedIcon /> },
-  { text: "Teams", data: <GroupAddOutlinedIcon /> },
   { text: "Logout", data: <LogoutOutlinedIcon /> },
 ];
 

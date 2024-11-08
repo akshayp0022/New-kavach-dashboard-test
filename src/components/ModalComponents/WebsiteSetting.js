@@ -10,6 +10,13 @@ import {
   ListItem,
   Button,
   Typography,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  FormControlLabel,
+  Switch,
+  Paper,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,31 +24,73 @@ import axios from "../../utils/endpoints";
 
 const WebsiteSetting = ({ currentEmployee }) => {
   const [tabIndex, setTabIndex] = useState(0);
-
   const [isEditingWhite, setIsEditingWhite] = useState(false);
-  const [isEditingBlack, setIsEditingBlack] = useState(false); 
   const [whiteListing, setWhiteListing] = useState({
-    proxyAddress: "",
+    proxyAddress: "none",
     port: "",
     exception: [],
+    enabled: false,
   });
-
   const [blackListing, setBlackListing] = useState([""]);
-
+  const [newWebsite, setNewWebsite] = useState("");
   const token = sessionStorage.getItem("token") || undefined;
 
   useEffect(() => {
     if (currentEmployee) {
-      const { proxyAddress, port, exception } =
+      const { proxyAddress, port, exception, enabled } =
         currentEmployee.featureSettings.whiteListing;
-
       setWhiteListing({
-        proxyAddress: proxyAddress,
-        port: port,
-        exception: exception[0] || [""],
+        proxyAddress: proxyAddress || "none",
+        port: port || "",
+        exception: exception || [""],
+        enabled: enabled === "true" || enabled === true,
       });
     }
   }, [currentEmployee]);
+
+  const handleAddNewWebsite = async () => {
+    if (newWebsite.trim() === "") return;
+    try {
+      const response = await axios.put(
+        `/features/${currentEmployee.employeeId}`,
+        {
+          websiteBlocker: [...blackListing, newWebsite],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setBlackListing((prev) => [...prev, newWebsite]);
+      setNewWebsite("");
+      console.log("Successfully added new website:", response.data);
+    } catch (error) {
+      console.error("Error adding new website:", error.message);
+    }
+  };
+
+  const handleRemoveWebsite = async (website) => {
+    try {
+      const updatedBlackListing = blackListing.filter(
+        (item) => item !== website
+      );
+      await axios.put(
+        `/features/${currentEmployee.employeeId}`,
+        {
+          websiteBlocker: updatedBlackListing,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setBlackListing(updatedBlackListing);
+    } catch (error) {
+      console.error("Error deleting website:", error.message);
+    }
+  };
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -55,6 +104,10 @@ const WebsiteSetting = ({ currentEmployee }) => {
     const updatedExceptions = [...whiteListing.exception];
     updatedExceptions[index] = event.target.value;
     setWhiteListing({ ...whiteListing, exception: updatedExceptions });
+  };
+
+  const handleToggleChange = (event) => {
+    setWhiteListing({ ...whiteListing, enabled: event.target.checked });
   };
 
   const handleAddException = () => {
@@ -75,23 +128,18 @@ const WebsiteSetting = ({ currentEmployee }) => {
     setIsEditingWhite(true);
   };
 
-  const handleEditClickBlack = () => {
-    setIsEditingBlack(true);
-  };
-  
-  // Handler for saving blacklisting changes
-  const handleSaveBlack = () => {
-    // Add your save logic here
-    setIsEditingBlack(false);
-  };
+  // handleEditClickCancle= () => {
+  //   setIsEditingWhite(false);
+  // }
   useEffect(() => {
     if (currentEmployee) {
       setBlackListing(currentEmployee.featureSettings.websiteBlocker || []);
     }
   }, [currentEmployee]);
+
   const handleSaveWhite = async () => {
     try {
-      const response = await axios.put(
+      await axios.put(
         `/features/${currentEmployee.employeeId}`,
         {
           whiteListing: whiteListing,
@@ -102,233 +150,219 @@ const WebsiteSetting = ({ currentEmployee }) => {
           },
         }
       );
+      setIsEditingWhite(false);
     } catch (error) {
       console.error("Error updating whiteListing:", error.message);
-    }
-  };
-  // console.log(currentEmployee.featureSettings.websiteBlocker)
-
-  const handleInputChangeBlackListing = (index, e) => {
-    const newFields = [...blackListing];
-    newFields[index] = e.target.value;
-    setBlackListing(newFields);
-  };
-
-  const handleAddField = () => {
-    setBlackListing([...blackListing, ""]);
-  };
-
-  const handleRemoveField = (index) => {
-    const newFields = blackListing.filter((_, i) => i !== index);
-    setBlackListing(newFields);
-  };
-
-  const handleSubmitBlack = async () => {
-    try {
-      const response = await axios.put(
-        `/features/${currentEmployee.employeeId}`,
-        {
-          websiteBlocker: blackListing,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Data sent to server:", blackListing);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error sending data:", error);
     }
   };
 
   return (
     <Box>
-      <Tabs value={tabIndex} onChange={handleTabChange}>
+      <Tabs value={tabIndex} onChange={handleTabChange} variant="fullWidth">
         <Tab label="White Listing" />
         <Tab label="Black Listing" />
       </Tabs>
 
       {tabIndex === 0 && (
-        <Box p={2}>
-          <Grid container spacing={2} alignItems="center">
-            {/* Proxy Address Field */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Proxy Address"
-                variant="outlined"
-                value={whiteListing.proxyAddress}
-                onChange={handleInputChangeWhite("proxyAddress")}
-                disabled={!isEditingWhite}
-                sx={{ marginTop: "16px" }}
-              />
-            </Grid>
-
-            {/* Port Field */}
-            <Grid item xs={12} sm={3}>
-              <TextField
-                fullWidth
-                label="Port"
-                variant="outlined"
-                value={whiteListing.port}
-                onChange={handleInputChangeWhite("port")}
-                disabled={!isEditingWhite}
-                sx={{ marginTop: "16px" }}
-              />
-            </Grid>
-
-            {/* Initial Exception Field */}
-            {whiteListing.exception.map((exception, index) => (
-              <Grid item xs={12} sm={5} key={index}>
-                <ListItem sx={{ paddingBottom: 0 }}>
-                  <TextField
-                    fullWidth
-                    label={`Exception ${index + 1}`}
-                    variant="outlined"
-                    value={exception}
-                    onChange={handleExceptionChange(index)}
-                    disabled={!isEditingWhite}
-                    sx={{ marginTop: "16px" }}
-                  />
-                  {/* Show close button for dynamically added exceptions */}
-                  {isEditingWhite && (
-                    <IconButton
-                      onClick={() => handleRemoveException(index)}
-                      edge="end"
-                      sx={{ marginLeft: 1 }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  )}
-                </ListItem>
-              </Grid>
-            ))}
-
-            {/* Add Exception Button */}
+        <Box p={3} mt={6}>
+          <Paper
+            elevation={3}
+            sx={{ p: 3, borderRadius: "8px", position: "relative" }}
+          >
             {isEditingWhite && (
-              <Grid item xs={12}>
-                <Box
-                  display="flex"
-                  justifyContent="flex-start"
-                  sx={{ marginTop: 2 }}
-                >
+              <IconButton
+                sx={{ position: "absolute", top: 8, right: 8 }}
+                onClick={() => setIsEditingWhite(false)} 
+              >
+                <CloseIcon />
+              </IconButton>
+            )}
+
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={5}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel>Proxy Address</InputLabel>
+                  <Select
+                    value={whiteListing.proxyAddress}
+                    onChange={handleInputChangeWhite("proxyAddress")}
+                    disabled={!isEditingWhite}
+                    sx={{
+                      borderRadius: "8px",
+                      "&.Mui-error": {
+                        borderColor: "error.main",
+                      },
+                    }}
+                  >
+                    <MenuItem value="none">None</MenuItem>
+                    <MenuItem value={whiteListing.proxyAddress}>
+                      {whiteListing.proxyAddress}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  fullWidth
+                  label="Port"
+                  variant="outlined"
+                  value={whiteListing.port}
+                  onChange={handleInputChangeWhite("port")}
+                  disabled={!isEditingWhite}
+                  sx={{
+                    borderRadius: "8px",
+                    "&.Mui-error": {
+                      borderColor: "error.main",
+                    },
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={whiteListing.enabled}
+                      onChange={handleToggleChange}
+                      disabled={!isEditingWhite}
+                      color="primary"
+                    />
+                  }
+                  label={whiteListing.enabled ? "Enabled" : "Disabled"}
+                  labelPlacement="end"
+                />
+              </Grid>
+
+              {whiteListing.exception.map((exception, index) => (
+                <Grid item xs={12} key={index}>
+                  <ListItem
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      borderRadius: "8px",
+                      padding: "8px",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <TextField
+                      fullWidth
+                      label={`Exception ${index + 1}`}
+                      variant="outlined"
+                      value={exception}
+                      onChange={handleExceptionChange(index)}
+                      disabled={!isEditingWhite}
+                      sx={{ borderRadius: "8px" }}
+                    />
+                    {isEditingWhite && (
+                      <IconButton
+                        onClick={() => handleRemoveException(index)}
+                        edge="end"
+                        color="error"
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    )}
+                  </ListItem>
+                </Grid>
+              ))}
+
+              {isEditingWhite && (
+                <Grid item xs={12}>
                   <Button
                     variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={handleAddException}
+                    sx={{ borderRadius: "8px" }}
                   >
                     Add Exception
                   </Button>
-                </Box>
-              </Grid>
-            )}
-          </Grid>
+                </Grid>
+              )}
+            </Grid>
 
-          {/* Save / Edit Button */}
-          <Box mt={3} display="flex" justifyContent="flex-end">
-            {isEditingWhite ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSaveWhite}
-                sx={{ marginRight: 2 }}
-              >
-                Save
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleEditClickWhite}
-              >
-                Edit
-              </Button>
-            )}
-          </Box>
+            <Box mt={4} display="flex" justifyContent="flex-end">
+              {isEditingWhite ? (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleSaveWhite}
+                  sx={{ borderRadius: "8px" }}
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleEditClickWhite}
+                  sx={{ borderRadius: "8px" }}
+                >
+                  Edit
+                </Button>
+              )}
+            </Box>
+          </Paper>
         </Box>
       )}
 
-{tabIndex === 1 && (
-  <Box p={2}>
-    <Grid container spacing={2}>
-      {/* Render blacklisting as text when not in edit mode */}
-      {!isEditingBlack ? (
-        blackListing.map((field, index) => (
-          <Grid item xs={12} sm={6} key={index}>
-            <ListItem>
-              <Typography>{field}</Typography>
-            </ListItem>
-          </Grid>
-        ))
-      ) : (
-        // Render input fields when in edit mode
-        blackListing.map((field, index) => (
-          <Grid item xs={12} sm={6} key={index}>
-            <TextField
-              fullWidth
-              label={`Website ${index + 1}`}
-              variant="outlined"
-              value={field}
-              onChange={(e) => handleInputChangeBlackListing(index, e)}
-              sx={{ width: { xs: "100%", sm: "80%", md: "60%" } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    {blackListing.length > 1 && (
-                      <IconButton onClick={() => handleRemoveField(index)}>
+      {tabIndex === 1 && (
+        <Box p={2} mt={6}>
+          <Paper elevation={3} sx={{ p: 3, borderRadius: "8px" }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={`Add Website`}
+                  variant="outlined"
+                  value={newWebsite}
+                  onChange={(e) => setNewWebsite(e.target.value)}
+                  sx={{
+                    boxShadow: "0px 1px 3px rgba(0,0,0,0.2)",
+                    borderRadius: "8px",
+                    marginTop: "16px",
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleAddNewWebsite}>
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              {/* Display existing blacklisted websites with Cards */}
+              {blackListing.length > 0 &&
+                blackListing.map((field, index) => (
+                  <Grid item xs={12} sm={6} key={index}>
+                    <Paper
+                      elevation={2}
+                      sx={{
+                        p: 2,
+                        borderRadius: "8px",
+                        bgcolor: "#f9f9f9",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="body1" sx={{ flexGrow: 1 }}>
+                        {field}
+                      </Typography>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleRemoveWebsite(field)}
+                      >
                         <CloseIcon />
                       </IconButton>
-                    )}
-                    {index === blackListing.length - 1 && (
-                      <IconButton onClick={handleAddField}>
-                        <AddIcon />
-                      </IconButton>
-                    )}
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-        ))
-      )}
-
-      {/* Save / Edit Button for Blacklisting */}
-      <Grid item xs={12}>
-        <Box mt={2} display="flex" justifyContent="flex-end">
-          {isEditingBlack ? (
-            <>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSaveBlack}
-                sx={{ marginRight: 2 }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmitBlack}
-              >
-                Submit
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleEditClickBlack}
-            >
-              Edit
-            </Button>
-          )}
+                    </Paper>
+                  </Grid>
+                ))}
+            </Grid>
+          </Paper>
         </Box>
-      </Grid>
-    </Grid>
-  </Box>
-)}
+      )}
     </Box>
   );
 };

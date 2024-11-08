@@ -1,9 +1,8 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import { Container, Typography, TextField } from "@mui/material";
-import { useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Container, Typography } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
 import { useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -11,8 +10,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
-import { TextIcon } from "./Table/TableComponents";
-import { RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
+import { TextIcon, RoundNameCircle, BadgeIcon } from "./Table/TableComponents";
 import TransitionsModal from "./Modal";
 import { useAppContext } from "./AppContext";
 import { useEmployeeContext } from "../context/employee";
@@ -31,16 +29,20 @@ const EmpTable = () => {
     `(max-width:${theme.breakpoints.values.modal}px)`
   );
 
-  const { employees } = useEmployeeContext();
+  // const { employees, fetchEmployees } = useEmployeeContext();
   const { statusData } = useStatus();
+  const { employees, loading, error } = useEmployeeContext();
 
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [modalContent, handleModalContent] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
-
   const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
+
+  // useEffect(() => {
+  //   fetchEmployees();
+  // }, []);
 
   const handleChangePage = (newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -56,17 +58,19 @@ const EmpTable = () => {
   const handleClose = () => {
     setOpen(false);
     setCurrentEmployeeId(null);
+    setActiveItem("Features Settings");
+    handleModalContent("Features Settings");
   };
+
   const handleChangeModalContent = (newValue) => {
     handleModalContent(newValue);
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading employees</div>;
+
   const rowsData = employees.map(({ name, _id, employeeId, status }, index) => {
     const employeeStatus = statusData[employeeId]?.status || "deactivated";
-    console.log(employeeStatus);
-
-    //TODO: Add employee status
-    //TODO:  add status in the params along with name and id
     return {
       id: index + 1,
       status: <BadgeIcon status={employeeStatus} />,
@@ -166,15 +170,22 @@ const EmpTable = () => {
     <>
       <Container
         maxWidth={isSmallScreen ? false : "100vw"}
-        sx={{ width: "100%", marginTop: "5em" }}
+        sx={{
+          width: "100%",
+          marginTop: "5em",
+          paddingBottom: "2em",
+          height: "calc(100vh - 5em)",
+          overflow: "hidden",
+        }}
         className="tableData"
         id="tableData"
       >
         <Paper
-          sx={{ width: "80%", overflow: "hidden" }}
+          sx={{ width: "100%", height: "100%", overflow: "hidden" }}
           id="tablePaper"
           style={{
             width: isSideBarOpen ? "83%" : "92vw",
+            height: "100%",
           }}
         >
           <div
@@ -185,85 +196,26 @@ const EmpTable = () => {
               {`All Employees (${rowsData.length})`}
             </Typography>
             <TransitionsModal />
-            <TextField fullWidth label="Search" id="textFieldSearch" />
           </div>
-          <Paper sx={{ height: "100%", width: "100%" }}>
+          <Paper
+            sx={{
+              height: "calc(100% - 4em)",
+              width: "100%",
+              overflow: "auto",
+            }}
+          >
             <DataGrid
               rows={rowsData}
               columns={Newcolumns}
-              pagination
-              pageSize={rowsPerPage}
-              rowsPerPageOptions={[10, 25, 100]}
-              checkboxSelection
-              paginationModel={{ page, pageSize: rowsPerPage }}
-              onPageSizeChange={handleChangeRowsPerPage}
-              onPageChange={handleChangePage}
               sx={{ border: 0 }}
+              style={{
+                height: "100%",
+                overflowY: "hidden",
+              }}
             />
           </Paper>
         </Paper>
       </Container>
-
-      {/* <Dialog open={open} onClose={handleClose} id="modal">
-         <div className="Modalwrapper">
-          <div className="sidebar-modal">
-            <div>
-              <Typography variant="h6" id="userName">
-                <RoundNameCircle
-                  name={
-                    employees.find(
-                      (emp) => emp.employeeId === currentEmployeeId
-                    )?.name || "N/A"
-                  }
-                  status={"active"}
-                />
-              </Typography>
-              <Typography id="employeeId">{currentEmployeeId}</Typography>
-            </div>
-            {isModal ? (
-              <DialogActions onClick={handleClose}>
-                <CloseOutlinedIcon sx={{ color: "#696969" }} />
-              </DialogActions>
-            ) : (
-              <List>
-                {modalList.map((item, index) => (
-                  <ListItem
-                    key={index}
-                    id="listItem"
-                    onClick={(e) => {
-                      handleChangeModalContent(
-                        item.split(" ").join("_").toLowerCase()
-                      );
-                      setActiveItem(item);
-                    }}
-                    sx={{
-                      backgroundColor:
-                        activeItem === item ? "#d3d3d3" : "transparent",
-                      borderRadius: "8px",
-                      "&:hover": { backgroundColor: "#e0e0e0" },
-                    }}
-                  >
-                    <ListItemText primary={item} style={{ fontSize: "10px" }} />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </div>
-          <div className="modal-feature">
-            <DialogContent>
-              <DialogTitle style={{ padding: "16px 0px" }}>
-                <ModalContentTitle contentValue={modalContent} />
-              </DialogTitle>
-              <DialogActions onClick={handleClose}>
-                <CloseOutlinedIcon sx={{ color: "#696969" }} />
-              </DialogActions>
-              <DialogContent>
-                <ModalContent contentValue={modalContent} />
-              </DialogContent>
-            </DialogContent>
-          </div>
-        </div>
-      </Dialog> */}
 
       <EmployeeModal
         open={open}

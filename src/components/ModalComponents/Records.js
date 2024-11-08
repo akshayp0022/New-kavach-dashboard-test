@@ -95,7 +95,7 @@ function Records({ currentEmployee }) {
 
   return (
     <Container maxWidth="sm">
-      <Paper elevation={3} style={{ padding: "20px", borderRadius: "10px" }}>
+      <Paper elevation={3} style={{ padding: "20px", borderRadius: "10px", marginTop: "20px" }}>
         
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>

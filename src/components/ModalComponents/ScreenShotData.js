@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Grid,
   TextField,
@@ -8,7 +8,6 @@ import {
   IconButton,
   Tab,
   Tabs,
-  Typography,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,12 +15,10 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import AccessTime from "@mui/icons-material/AccessTime";
 import dayjs from "dayjs";
-import { io } from "socket.io-client";
 import { useStatus } from "../../context/status";
-import { ws } from "../../utils/endpoints";
 
 const EmailSettings = ({ currentEmployee }) => {
-  const { statusData } = useStatus();
+  const { statusData, socket } = useStatus();
 
   const employeeStatus =
     statusData[currentEmployee.employeeId]?.status || "deactivated";
@@ -46,7 +43,6 @@ const EmailSettings = ({ currentEmployee }) => {
     endTime: null,
   });
 
-  const [socket, setSocket] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
@@ -54,33 +50,6 @@ const EmailSettings = ({ currentEmployee }) => {
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
-
-  useEffect(() => {
-    const newSocket = io(ws, {
-      transports: ["websocket"],
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 2000,
-    });
-
-    newSocket.on("connect", () => {
-      console.log("Connected to WebSocket");
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Disconnected from WebSocket");
-    });
-
-    newSocket.on("error", (message) => {
-      console.error("Socket error:", message);
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.close();
-    };
-  }, []);
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -113,13 +82,12 @@ const EmailSettings = ({ currentEmployee }) => {
         employeeId: currentEmployee?.employeeId,
       };
 
-      console.log("data to semd to ws live: ", dataToSend);
+      console.log("Data to send to WS live: ", dataToSend);
       socket.emit("takeScreenshot", dataToSend);
       setSnackbarMessage("Data sent to WebSocket");
       setSnackbarOpen(true);
     }
   };
-
   const handleTakeScreenshot = () => {
     handleSendToWebSocket();
   };
@@ -140,13 +108,12 @@ const EmailSettings = ({ currentEmployee }) => {
         employeeId: currentEmployee?.employeeId,
       };
       console.log("Data sent to WebSocket: ", dataToSend);
-  
+
       socket.emit("sendEmailSettings", dataToSend);
       setSnackbarMessage("Scheduled data sent to WebSocket");
       setSnackbarOpen(true);
     }
   };
-  
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -168,7 +135,7 @@ const EmailSettings = ({ currentEmployee }) => {
         </Tabs>
 
         {/* Live Screenshot Tab Content */}
-        {selectedTab === 0 && showUI && (
+        {selectedTab === 0 && (
           <Grid container spacing={2} item>
             <Grid item xs={12} sm={6} md={4}>
               <TextField
@@ -220,7 +187,7 @@ const EmailSettings = ({ currentEmployee }) => {
         )}
 
         {/* If Employee is not active or idle */}
-        {selectedTab === 0 && !showUI && (
+        {/* {selectedTab === 0  && (
           <Grid
             container
             justifyContent="center"
@@ -231,7 +198,7 @@ const EmailSettings = ({ currentEmployee }) => {
               Employee is not active or idle.
             </Typography>
           </Grid>
-        )}
+        )} */}
 
         {/* Schedule Screenshot Tab Content */}
         {selectedTab === 1 && (

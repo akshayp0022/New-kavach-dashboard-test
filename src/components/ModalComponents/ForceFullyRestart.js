@@ -1,78 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Grid, Typography, Button, TextField } from '@mui/material';
-import { MobileTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import io from 'socket.io-client';
-import { ws } from "../../utils/endpoints";
-import { useStatus } from '../../context/status';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Grid,
+  Typography,
+  Button,
+  TextField,
+  Snackbar,
+} from "@mui/material";
+import { useStatus } from "../../context/status";
+
+const getISTTime = () => {
+  const currentTime = new Date();
+  const istTime = new Date(currentTime.getTime());
+  return istTime.toTimeString().slice(0, 5);
+};
 
 const ForcefullyRestartSettings = ({ currentEmployee }) => {
-  const [socket, setSocket] = useState(null);
   const [restartSettings, setRestartSettings] = useState({
-    enabled: false,
+    enabled: true,
     dayInterval: "1",
-    time: dayjs(),
+    time: getISTTime(),
   });
-  
-  const { statusData } = useStatus();
-  const employeeStatus = statusData[currentEmployee.employeeId]?.status || "deactivated";
-  
+
+  const { statusData, socket } = useStatus();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const employeeStatus =
+    statusData[currentEmployee.employeeId]?.status || "deactivated";
+
   const showUI = employeeStatus === "active" || employeeStatus === "idle";
-  
+
   useEffect(() => {
     if (currentEmployee?.featureSettings?.forcefullyRestart) {
       const settings = currentEmployee.featureSettings.forcefullyRestart;
       setRestartSettings({
-        enabled: settings.enabled ,
+        enabled: settings.enabled,
         dayInterval: settings.dayInterval || 1,
-        time: settings.time ? dayjs(settings.time, "HH:mm") : dayjs(),
+        time: getISTTime(),
       });
     }
   }, [currentEmployee]);
 
   useEffect(() => {
-    const newSocket = io(ws, {
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 2000,
-    });
+    if (socket) {
+      socket.on("intervalRestart", (...data) => {
+        console.log("Received restart configuration:", data);
+      });
 
-    newSocket.on("connect", () => {
-      console.log("Connected to websocket");
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Disconnected from websocket");
-    });
-
-    newSocket.on("intervalRestart", (...data) => {
-      console.log("Received restart configuration:", data);
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.close();
-    };
-  }, []);
+      return () => {
+        socket.off("intervalRestart");
+      };
+    }
+  }, [socket]);
 
   const handleSaveSettings = () => {
     if (socket && socket.connected) {
-      console.log("Emitting restart settings with empId", currentEmployee?.employeeId || "NA");
+      console.log(
+        "Emitting restart settings with empId",
+        currentEmployee?.employeeId || "NA"
+      );
       socket.emit("restart", {
         employeeId: currentEmployee?.employeeId || null,
         enabled: restartSettings.enabled,
         dayInterval: Number(restartSettings.dayInterval),
-        time: restartSettings.time.format("HH:mm"),
+        time: restartSettings.time,
       });
 
       console.log("Emitted data", {
         employeeId: currentEmployee?.employeeId,
         enabled: restartSettings.enabled,
         dayInterval: restartSettings.dayInterval,
-        time: restartSettings.time.format("HH:mm"),
+        time: restartSettings.time,
       });
+
+      setSnackbarOpen(true);
     }
   };
 
@@ -87,16 +87,16 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
     }));
   };
 
-  const handleTimeChange = (newValue) => {
-    setRestartSettings((prevSettings) => ({
-      ...prevSettings,
-      time: dayjs(newValue),
+  const handleTimeChange = (event) => {
+    setRestartSettings((prevState) => ({
+      ...prevState,
+      time: event.target.value,
     }));
   };
 
-  if (!showUI) {
-    return <Typography variant="h6">Employee is not active or idle.</Typography>;
-  }
+  // if (!showUI) {
+  //   return <Typography variant="h6">Employee is not active or idle.</Typography>;
+  // }
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -118,16 +118,15 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
         </Grid>
 
         <Grid item xs={6}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MobileTimePicker
-              label="Time"
-              value={restartSettings.time}
-              onChange={handleTimeChange}
-              openTo="minutes"
-              views={["hours", "minutes"]}
-              format="HH:mm"
-            />
-          </LocalizationProvider>
+          <TextField
+            fullWidth
+            label="Time"
+            variant="outlined"
+            type="time"
+            value={restartSettings.time}
+            onChange={handleTimeChange}
+            InputLabelProps={{ shrink: true }}
+          />
         </Grid>
 
         <Grid item xs={12} container justifyContent="flex-end">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -8,17 +8,21 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "../../utils/endpoints";
+import { useStatus } from "../../context/status";
 
 const Wallpaper = ({ currentEmployee }) => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [wallpaperData, setWallpaperData] = useState({});
+
+  const { socket } = useStatus();
+  console.log(socket);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
 
-    // Validate file type and size (e.g., max 5MB)
     if (file && file.size > 5 * 1024 * 1024) {
       setErrorMessage("File size exceeds 5MB");
       return;
@@ -28,7 +32,7 @@ const Wallpaper = ({ currentEmployee }) => {
       return;
     }
 
-    setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage("");
     const filereader = new FileReader();
     filereader.onload = () => {
       setImagePreview(filereader.result);
@@ -60,15 +64,40 @@ const Wallpaper = ({ currentEmployee }) => {
           },
         }
       );
-      console.log("Image uploaded successfully:", response.data);
-      setImagePreview(response.data.url); // Optionally, update preview with uploaded image URL
+      console.log("Image uploaded successfully:", response.data.data.image);
+
+      const updatedWallpaperData = {
+        employeeId: currentEmployee?.employeeId,
+        imageUrl: response.data.data.image,
+      };
+
+      setWallpaperData(updatedWallpaperData);
+
+      if (socket) {
+        console.log("Socket connected:", socket.id);
+        socket.emit("trigger_change_wallpaper", updatedWallpaperData);
+        console.log("Emitting wallpaper change:", updatedWallpaperData);
+      }
+
+      setImagePreview(response.data.url); 
+      setImage(null); 
+      setErrorMessage(""); 
     } catch (error) {
       console.error("Error uploading image:", error);
       setErrorMessage("Failed to upload image. Please try again.");
     } finally {
-      setUploading(false);
+      setUploading(false); 
+
     }
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("Socket connected:", socket.id);
+      });
+    }
+  }, [socket]);
 
   return (
     <div>

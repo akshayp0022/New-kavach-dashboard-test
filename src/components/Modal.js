@@ -12,7 +12,7 @@ import DownloadHistory from "./ModalComponents/DownloadHistory";
 import Keylogger from "./ModalComponents/KeyLogger";
 import Wallpaper from "./ModalComponents/Wallpaper";
 import Records from "./ModalComponents/Records";
-
+import Location from "./ModalComponents/Location";
 const style = {
   position: "absolute",
   top: "50%",
@@ -68,7 +68,7 @@ export const ModalContentTitle = ({ contentValue }) => {
     case "forcefully_restart":
       return <Typography variant="h4">Forcefully Restart</Typography>;
 
-    case "screenshot":
+    case "capture_screenshot":
       return <Typography variant="h4">Screenshot</Typography>;
 
     case "website_settings":
@@ -86,8 +86,11 @@ export const ModalContentTitle = ({ contentValue }) => {
     case "wallpaper_settings":
       return <Typography variant="h4">Wallpaper Settings</Typography>;
 
-    case "audio_recording":
-      return <Typography variant="h4">Record Settings</Typography>;
+    case "test":
+      return <Typography variant="h4">test Settings</Typography>;
+
+    case "live_location":
+      return <Typography variant="h4">Live Location</Typography>;
 
     default:
       return <Typography variant="h4">Features Settings</Typography>;
@@ -102,7 +105,7 @@ export const ModalContent = ({ contentValue, currentEmployee }) => {
     case "forcefully_restart":
       return <ForceFullyRestart currentEmployee={currentEmployee} />;
 
-    case "screenshot":
+    case "capture_screenshot":
       return <ScreenShotData currentEmployee={currentEmployee} />;
 
     case "website_settings":
@@ -120,8 +123,11 @@ export const ModalContent = ({ contentValue, currentEmployee }) => {
     case "wallpaper_settings":
       return <Wallpaper currentEmployee={currentEmployee} />;
 
-    case "audio_recording":
+    case "test":
       return <Records currentEmployee={currentEmployee} />;
+
+    case "live_location":
+      return <Location currentEmployee={currentEmployee} />;
 
     default:
       return <FeatureSettings currentEmployee={currentEmployee} />;

@@ -1,53 +1,98 @@
 import React, { useState, useEffect } from "react";
-import { BarChart } from "@mui/x-charts/BarChart";
-import {
-  Container,
-  Grid,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
-import io from "socket.io-client";
-import { ws } from "../../utils/endpoints";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import { useStatus } from "../../context/status";
 
-const DownloadHistoryList = ({ downloadHistory }) => {
-  const { Chrome, FireFox, Edge } = downloadHistory;
+const DownloadHistoryTable = ({ downloadHistory }) => {
+  const [loading, setLoading] = useState(true);
+
+  const extractDomain = (url) => {
+    if (!url) return "Unknown";
+    const domain = url.replace(/^(https?:\/\/)?/, "");
+    return domain.split("/")[0];
+  };
+
+  const convertSizeToMB = (sizeInBytes) => {
+    if (!sizeInBytes || isNaN(sizeInBytes)) return "N/A";
+    const sizeInMB = sizeInBytes / (1024 * 1024);
+    return `${sizeInMB.toFixed(2)} MB`;
+  };
+
+  const combinedHistory = [
+    ...(downloadHistory.Chrome || []).map((item, index) => ({
+      id: `chrome-${item[1]}-${index}`,
+      nameWebsite: extractDomain(item[1]),
+      fileName: item[0]?.trim().split("\\").pop() || "N/A",
+      size: convertSizeToMB(item[2]),
+      dateTime: item[4],
+    })),
+    ...(downloadHistory.FireFox || []).map((item, index) => ({
+      id: `firefox-${item[1]}-${index}`,
+      nameWebsite: extractDomain(item[1]), // Trim the website URL
+      fileName: item[0]?.trim().split("\\").pop() || "N/A",
+      size: convertSizeToMB(item[2]), // Convert file size to MB
+      dateTime: item[4],
+    })),
+    ...(downloadHistory.Edge || []).map((item, index) => ({
+      id: `edge-${item[1]}-${index}`,
+      nameWebsite: extractDomain(item[1]),
+      fileName: item[0]?.trim().split("\\").pop() || "N/A",
+      size: convertSizeToMB(item[2]),
+      dateTime: item[4],
+    })),
+  ];
+
+  const columns = [
+    { field: "nameWebsite", headerName: "Website Name", flex: 1 },
+    {
+      field: "fileName",
+      headerName: "File Name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "size",
+      headerName: "Size (MB)",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "dateTime",
+      headerName: "Date & Time",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+  ];
+
+  useEffect(() => {
+    setLoading(false);
+  }, [downloadHistory]);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="90vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
-    <List>
-      {Chrome?.map((value, index) => (
-        <ListItem key={index} id="downloadHistoryList">
-          <ListItemText>
-            <Typography
-              variant="p"
-              sx={{ display: "block", textAlign: "justify" }}
-              fontSize={18}
-            >
-              <b>Link: </b>
-              {value[1]}
-            </Typography>
-            <Typography
-              variant="p"
-              sx={{ display: "block", textAlign: "justify" }}
-              fontSize={18}
-            >
-              <b>Device: </b>
-              {value[0]}
-            </Typography>
-            <Typography
-              variant="p"
-              sx={{ display: "block", textAlign: "justify" }}
-              fontSize={18}
-            >
-              <b>Date and Time: </b>
-              {value[4]}
-            </Typography>
-          </ListItemText>
-        </ListItem>
-      ))}
-    </List>
+    <div style={{ height: "90vh", width: "100%" }}>
+      <DataGrid
+        rows={combinedHistory}
+        columns={columns}
+        pageSize={20}
+        pagination
+      />
+    </div>
   );
 };
 
@@ -57,118 +102,75 @@ const DownloadHistory = ({ currentEmployee }) => {
     FireFox: [],
     Edge: [],
   });
+  // eslint-disable-next-line
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [socket, setSocket] = useState(null);
-
-  console.log(currentEmployee.employeeId);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const { socket } = useStatus();
 
   useEffect(() => {
-    if (currentEmployee?.employeeId) {
+    console.log("empid: >>", currentEmployee?.employeeId);
+    console.log("websocket: >>", socket);
+
+    if (currentEmployee?.employeeId && socket) {
       setSelectedEmployee(currentEmployee.employeeId);
-      console.log("Selected employee:", currentEmployee.employeeId);
 
-      const newSocket = io(ws, {
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 2000,
-      });
+      socket.emit("getDownloadHistory", currentEmployee.employeeId);
 
-      newSocket.on("connect", () => {
-        console.log("Connected to WebSocket");
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        setError(true);
+      }, 10000);
 
-        if (currentEmployee?.employeeId) {
-          newSocket.emit("getDownloadHistory", currentEmployee.employeeId);
-        }
-      });
-
-      newSocket.on("disconnect", () => {
-        console.log("Disconnected from WebSocket");
-      });
-
-      newSocket.on("sendDownloadHistory", (data) => {
+      socket.on("sendDownloadHistory", (data) => {
         console.log("Received data from server:", data);
-        if (data?.data?.employeeId === currentEmployee.employeeId) {
+        if (data?.employeeId === currentEmployee.employeeId) {
           console.log("History matched, updating state");
-          setDownloadHistory(data.data.history);
+          setDownloadHistory(data.data);
+          setLoading(false);
+          clearTimeout(timeoutId); 
         } else {
           console.log("Employee ID does not match.");
         }
       });
 
-      newSocket.on("error", (message) => {
-        console.error("Socket error:", message);
-      });
-
-      setSocket(newSocket);
-
       return () => {
-        newSocket.close();
+        socket.off("sendDownloadHistory");
       };
     }
-  }, [currentEmployee]);
+  }, [currentEmployee, socket]);
 
-  const handleGetDownloadHistory = () => {
-    if (socket && socket.connected && currentEmployee?.employeeId) {
-      socket.emit("getDownloadHistory", currentEmployee.employeeId);
-    } else {
-      console.log("WebSocket is not open. Reconnecting...");
-      socket?.connect();
-    }
-  };
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="90vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="90vh"
+      >
+        <Typography variant="h6" color="error">
+          Failed to load download history. Please try again later.
+        </Typography>
+      </Box>
+    );
+  }
   return (
     <>
-      <Container id="downloadHistory">
-        <Grid container>
-          <Grid item xs={12} sm={6} md={6} flexGrow={2}>
-            <div>
-              <BarChart
-                sx={{ padding: "0" }}
-                series={[{ data: [80, 44, 24, 21, 10, 56] }]}
-                height={290}
-                width={450}
-                xAxis={[
-                  {
-                    data: [
-                      "Google",
-                      "Youtube",
-                      "Gmail",
-                      "W.Web",
-                      "Instagram",
-                      "LinkedIn",
-                    ],
-                    scaleType: "band",
-                  },
-                ]}
-                margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-              />
-            </div>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={6} flexGrow={1}>
-            <div>
-              <PieChart
-                series={[
-                  {
-                    data: [
-                      { id: 0, value: 10, label: "series A" },
-                      { id: 1, value: 15, label: "series B" },
-                      { id: 2, value: 20, label: "series C" },
-                    ],
-                  },
-                ]}
-                width={450}
-                height={250}
-              />
-            </div>
-          </Grid>
-        </Grid>
-      </Container>
-
       <Container sx={{ mt: 2 }}>
-        <Typography variant="h6">Records</Typography>
-        <DownloadHistoryList downloadHistory={downloadHistory} />
+        <DownloadHistoryTable downloadHistory={downloadHistory} />
       </Container>
     </>
   );

@@ -16,13 +16,12 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  console.log("user: ", user);
-
   const [token, setToken] = useState(null);
 
   useEffect(() => {
     const savedToken = sessionStorage.getItem("token");
     const savedUser = sessionStorage.getItem("user");
+
     if (savedToken) {
       setToken(savedToken);
     }
@@ -33,22 +32,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post(`/auth/login`, {
-        username,
-        password,
-      });
+      const response = await axios.post(`/auth/login`, { username, password });
+      const token = response.data.data.token;
       const userData = {
         initials: response.data.userInitials,
         message: response.data.message,
       };
-      setUser(userData);
-      sessionStorage.setItem("token", response.data.data.token);
-      sessionStorage.setItem("user", JSON.stringify(userData));
-      setToken(response.data.token);
 
-      if (response.data.token) {
-        navigate("/");
-      }
+      
+      setUser(userData);
+      setToken(token);
+      sessionStorage.setItem("token", token);
+      sessionStorage.setItem("user", JSON.stringify(userData));
+
+      navigate("/teams");
     } catch (error) {
       console.error("Login failed: ", error);
     }
@@ -57,7 +54,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    setUser(null);
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
     navigate("/login");

@@ -5,9 +5,10 @@ import {
   Grid,
   Typography,
   Box,
+  Button,
 } from "@mui/material";
 import axios from "../../utils/endpoints";
-
+import { useEmployeeContext } from "../../context/employee";
 const FeatureSettings = ({ currentEmployee }) => {
   const toggleOptions = {
     usbPolicy: "Restrict Access To USB Setting",
@@ -20,8 +21,8 @@ const FeatureSettings = ({ currentEmployee }) => {
     gps: "Restrict Access to GPS",
   };
 
+  const { fetchEmployees } = useEmployeeContext();
   const token = sessionStorage.getItem("token") || undefined;
-
   const [settings, setSettings] = useState({
     usbPolicy: false,
     taskManager: false,
@@ -32,9 +33,11 @@ const FeatureSettings = ({ currentEmployee }) => {
     internetAccess: false,
     gps: false,
   });
+  const [isUpdated, setIsUpdated] = useState(false); 
+  
 
   useEffect(() => {
-    if (currentEmployee?.featureSettings) {
+    if (currentEmployee && currentEmployee.featureSettings) {
       setSettings({
         usbPolicy: currentEmployee.featureSettings.usbPolicy || false,
         taskManager: currentEmployee.featureSettings.taskManager || false,
@@ -48,34 +51,53 @@ const FeatureSettings = ({ currentEmployee }) => {
     }
   }, [currentEmployee]);
 
-  const handleToggle = async (option) => {
-    const newValue = !settings[option]; 
-
+  const handleToggle = (option) => {
     setSettings((prevSettings) => ({
       ...prevSettings,
-      [option]: newValue,
+      [option]: !prevSettings[option],
     }));
+    
+    setIsUpdated(true); 
+  };
 
+  const handleSave = async () => {
     try {
-      await axios.put(
+     
+      const response = await axios.put(
         `/features/${currentEmployee.employeeId}`,
-        {
-          [option]: newValue,
-        },
+        settings,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+  
+      console.log("Feature settings updated:", response.data.data);
+  
+      setSettings({
+        usbPolicy: response.data.data.usbPolicy,
+        taskManager: response.data.data.taskManager,
+        rightClick: response.data.data.rightClick,
+        systemSettings: response.data.data.systemSettings,
+        copyPaste: response.data.data.copyPaste,
+        cameraSetting: response.data.data.cameraSetting,
+        internetAccess: response.data.data.internetAccess,
+        gps: response.data.data.gps,
+      });
+  
+      setIsUpdated(false); 
+      fetchEmployees();
     } catch (error) {
       console.error("Error updating feature settings:", error);
-      setSettings((prevSettings) => ({
-        ...prevSettings,
-        [option]: !newValue,
-      }));
     }
   };
+  
+  
+
+  if (!currentEmployee || !currentEmployee.featureSettings) {
+    return <Typography>Loading feature settings...</Typography>;
+  }
 
   return (
     <>
@@ -123,6 +145,23 @@ const FeatureSettings = ({ currentEmployee }) => {
           ))}
         </Grid>
       </FormGroup>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          mt: 18,
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={!isUpdated} 
+          onClick={handleSave}
+        >
+          Save
+        </Button>
+      </Box>
     </>
   );
 };

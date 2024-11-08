@@ -19,14 +19,19 @@ export const moreHorizStyles = {
 export const modalList = [
   "Features Settings",
   "Forcefully Restart",
-  "Screenshot",
+  "Capture Screenshot",
   "Website Settings",
   "Internet History",
   "Download History",
   'Keylogger History',
   'Wallpaper Settings',
-  'Audio Recording',
+  'test',
+  "Live Location"
 ];
+
+export const ModalIconList = [
+  <BadgeOutlinedIcon />
+]
 
 export const columns = [
   {

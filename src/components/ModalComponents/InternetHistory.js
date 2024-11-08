@@ -6,19 +6,44 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Button,
+  Tab,
+  Tabs,
+  CircularProgress,
 } from "@mui/material";
-import io from "socket.io-client";
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { ws } from "../../utils/endpoints"
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useStatus } from "../../context/status";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const InternetHistory = ({ currentEmployee }) => {
   const [browserHistory, setBrowserHistory] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState({ labels: [], dataCounts: [] });
   const socketRef = useRef(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const { socket } = useStatus();
+  console.log("socket",socket);
+  
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
   const handleGetBrowserHistory = () => {
     if (
@@ -33,87 +58,59 @@ const InternetHistory = ({ currentEmployee }) => {
   };
 
   useEffect(() => {
-    if (!socketRef.current) {
-      socketRef.current = io(ws, {
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 2000,
-      });
+    if (currentEmployee?.employeeId) {
+      console.log("Employee ID:", currentEmployee.employeeId);
+    }
+  }, [currentEmployee]);
 
-      socketRef.current.on("connect", () => {
-        console.log("Connected to WebSocket");
+  useEffect(() => {
+    if (socket && currentEmployee?.employeeId) {
+      setLoading(true); // Show loader
+      socket.emit("getBrowserHistory", currentEmployee.employeeId);
 
-        if (currentEmployee?.employeeId) {
-          handleGetBrowserHistory();
-        }
-      });
-
-      socketRef.current.on("disconnect", () => {
-        console.log("Disconnected from WebSocket");
-      });
-
-      socketRef.current.on("sendBrowserHistory", (data) => {
+      socket.on("sendBrowserHistory", (data) => {
         if (data.error) {
           setError(data.error);
           setBrowserHistory([]);
+          setLoading(false); // Hide loader
         } else if (data && data.employeeId) {
-          console.log("Received data from server:", data);
-
           if (
             String(data.employeeId).trim() ===
             String(currentEmployee?.employeeId).trim()
           ) {
-            console.log("Employee ID matches");
+            const chromeHistory = (data.data.Chrome || []).filter(
+              (item) => item !== "No data found"
+            );
+            const edgeHistory = (data.data.Edge || []).filter(
+              (item) => item !== "No data found"
+            );
+            const firefoxHistory = (data.data.Firefox || []).filter(
+              (item) => item !== "No data found"
+            );
 
-            if (
-              data.data &&
-              (Array.isArray(data.data.Chrome) ||
-                Array.isArray(data.data.Edge) ||
-                Array.isArray(data.data.Firefox))
-            ) {
-              const combinedHistory = [
-                ...(data.data.Chrome || []),
-                ...(data.data.Edge || []),
-                ...(data.data.Firefox || []),
-              ];
-              setBrowserHistory(combinedHistory);
-              setError(null);
-            } else {
-              console.log("No valid browser history data.");
-              setBrowserHistory([]);
-            }
-          } else {
-            console.log("Employee ID does not match.");
-            setBrowserHistory([]);
+            const combinedHistory = [
+              ...chromeHistory,
+              ...edgeHistory,
+              ...firefoxHistory,
+            ];
+
+            setBrowserHistory(combinedHistory);
+            setError(null);
+            setLoading(false); // Hide loader
           }
         }
       });
 
-      socketRef.current.on("error", (message) => {
-        console.error("Socket error:", message);
-        setError(message);
-        setBrowserHistory([]);
-      });
+      return () => {
+        socket.off("sendBrowserHistory");
+      };
     }
-
-    if (currentEmployee?.employeeId) {
-      handleGetBrowserHistory();
-    }
-
-    return () => {
-      if (socketRef.current) {
-        console.log("Disconnecting WebSocket");
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, [currentEmployee]);
+  }, [socket, currentEmployee]);
 
   useEffect(() => {
     if (browserHistory.length > 0) {
-      const labels = browserHistory.map(item => item.url);
-      const dataCounts = browserHistory.map(item => item.visit_count);
+      const labels = browserHistory.map((item) => item.url);
+      const dataCounts = browserHistory.map((item) => item.visit_count);
 
       setChartData({
         labels,
@@ -124,7 +121,11 @@ const InternetHistory = ({ currentEmployee }) => {
 
   return (
     <div>
-      {error ? (
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+          <CircularProgress />
+        </Box>
+      ) : error ? (
         <div>
           <Typography color="error">Error: {error}</Typography>
         </div>
@@ -135,62 +136,151 @@ const InternetHistory = ({ currentEmployee }) => {
             {currentEmployee?.employeeId || "Unknown"}
           </Typography>
 
-          {/* Display browser history */}
-          <div>
-            {browserHistory.length > 0 ? (
-              <Box
-                sx={{
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  padding: "10px",
-                  marginTop: "10px",
-                  maxHeight: "400px",
-                  overflowY: "auto",
-                }}
-              >
-                <Typography variant="h6">Browser History</Typography>
-                <List>
-                  {browserHistory.map((item, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem>
-                        <ListItemText
-                          primary={`URL: ${item.url}`}
-                          secondary={`Title: ${item.title} - Visit Count: ${item.visit_count}`}
-                        />
-                      </ListItem>
-                      <Divider />
-                    </React.Fragment>
-                  ))}
-                </List>
-              </Box>
-            ) : (
-              <Typography>No browser history available.</Typography>
-            )}
-          </div>
+          {/* Tabs for switching views */}
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="browser history tabs"
+          >
+            <Tab label="List" />
+            <Tab label="Analyticals" />
+          </Tabs>
 
-          {/* Display browser history chart */}
-          <div>
-                <Bar
-              data={{
-                labels: chartData.labels,
-                datasets: [{
-                  label: 'Visit Count',
-                  data: chartData.dataCounts,
-                  backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  borderWidth: 1,
-                }],
+          {/* List View */}
+          {activeTab === 0 && (
+            <div>
+              {browserHistory.length > 0 ? (
+                <Box
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    padding: "10px",
+                    marginTop: "10px",
+                    maxHeight: "400px",
+                    overflowY: "auto",
+                    backgroundColor: "#f9f9f9",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <Typography variant="h6" fontWeight="bold">
+                    Browser History
+                  </Typography>
+                  <List>
+                    {browserHistory.map((item, index) => (
+                      <React.Fragment key={index}>
+                        <ListItem
+                          sx={{
+                            padding: "10px 0",
+                            "&:hover": {
+                              backgroundColor: "#f5f5f5",
+                            },
+                          }}
+                        >
+                          <ListItemText
+                            primary={
+                              <Typography fontWeight="bold">{`URL: ${item.url}`}</Typography>
+                            }
+                            secondary={`Title: ${item.title} - Visit Count: ${item.visit_count}`}
+                          />
+                        </ListItem>
+                        <Divider
+                          sx={{ marginY: "4px", backgroundColor: "#e0e0e0" }}
+                        />
+                      </React.Fragment>
+                    ))}
+                  </List>
+                </Box>
+              ) : (
+                <Typography variant="body1">
+                  No browser history available.
+                </Typography>
+              )}
+            </div>
+          )}
+
+          {/* Analytical View */}
+          {activeTab === 1 && (
+            <Box
+              p={3}
+              sx={{
+                backgroundColor: "#f9f9f9",
+                borderRadius: "8px",
+                boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
               }}
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
+            >
+              <Bar
+                data={{
+                  labels: chartData.labels.map((url) => {
+                    const hostname = new URL(url).hostname;
+                    return hostname.replace("www.", "").split(".")[0];
+                  }),
+                  datasets: [
+                    {
+                      label: "Visit Count",
+                      data: chartData.dataCounts,
+                      backgroundColor: "rgba(75, 192, 192, 0.6)",
+                      borderColor: "rgba(75, 192, 192, 1)",
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false, // Allows you to set a custom height and width
+                  scales: {
+                    x: {
+                      ticks: {
+                        font: {
+                          size: 14, // Larger font for the URL labels
+                          weight: "bold",
+                        },
+                        color: "#333", // Darker color for better readability
+                      },
+                      title: {
+                        display: true,
+                        text: "URLs",
+                        font: {
+                          size: 16, // Axis title font size
+                          weight: "bold",
+                        },
+                        color: "#000",
+                      },
+                    },
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        font: {
+                          size: 14, // Larger font for Y-axis labels
+                        },
+                        color: "#333",
+                      },
+                      title: {
+                        display: true,
+                        text: "Visit Count",
+                        font: {
+                          size: 16, // Axis title font size
+                          weight: "bold",
+                        },
+                        color: "#000",
+                      },
+                    },
                   },
-                },
-              }}
-            />
-          </div>
+                  plugins: {
+                    legend: {
+                      labels: {
+                        font: {
+                          size: 14, // Legend font size
+                        },
+                        color: "#333",
+                      },
+                    },
+                  },
+                }}
+                height={400} // Set the height of the chart
+                width={800} // Set the width of the chart
+              />
+            </Box>
+          )}
         </div>
       )}
     </div>
