@@ -13,17 +13,18 @@ import Keylogger from "./ModalComponents/KeyLogger";
 import Wallpaper from "./ModalComponents/Wallpaper";
 import Records from "./ModalComponents/Records";
 import Location from "./ModalComponents/Location";
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
+
+// const style = {
+//   position: "absolute",
+//   top: "50%",
+//   left: "50%",
+//   transform: "translate(-50%, -50%)",
+//   width: 400,
+//   bgcolor: "background.paper",
+//   border: "2px solid #000",
+//   boxShadow: 24,
+//   p: 4,
+// };
 
 export default function TransitionsModal() {
   const [open, setOpen] = React.useState(false);
@@ -61,40 +62,24 @@ export default function TransitionsModal() {
 }
 
 export const ModalContentTitle = ({ contentValue }) => {
-  switch (contentValue) {
-    case "features_settings":
-      return <Typography variant="h4">Features Settings</Typography>;
+  const titleMapping = {
+    features_settings: "Features Settings",
+    forcefully_restart: "Forcefully Restart",
+    capture_screenshot: "Screenshot",
+    website_settings: "Website Settings",
+    internet_history: "Internet History",
+    download_history: "Download History",
+    keylogger_history: "Keylogger History",
+    wallpaper_settings: "Wallpaper Settings",
+    test: "test Settings",
+    live_location: "Live Location",
+  };
 
-    case "forcefully_restart":
-      return <Typography variant="h4">Forcefully Restart</Typography>;
-
-    case "capture_screenshot":
-      return <Typography variant="h4">Screenshot</Typography>;
-
-    case "website_settings":
-      return <Typography variant="h4">Website Settings</Typography>;
-
-    case "internet_history":
-      return <Typography variant="h4">Internet History</Typography>;
-
-    case "download_history":
-      return <Typography variant="h4">Download History</Typography>;
-
-    case "keylogger_history":
-      return <Typography variant="h4">Keylogger History</Typography>;
-
-    case "wallpaper_settings":
-      return <Typography variant="h4">Wallpaper Settings</Typography>;
-
-    case "test":
-      return <Typography variant="h4">test Settings</Typography>;
-
-    case "live_location":
-      return <Typography variant="h4">Live Location</Typography>;
-
-    default:
-      return <Typography variant="h4">Features Settings</Typography>;
-  }
+  return (
+    <Typography variant="h5" component="div">
+      {titleMapping[contentValue] || "Features Settings"}
+    </Typography>
+  );
 };
 
 export const ModalContent = ({ contentValue, currentEmployee }) => {

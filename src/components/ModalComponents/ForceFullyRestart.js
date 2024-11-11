@@ -5,7 +5,6 @@ import {
   Typography,
   Button,
   TextField,
-  Snackbar,
 } from "@mui/material";
 import { useStatus } from "../../context/status";
 
@@ -100,12 +99,12 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
+      <Grid container spacing={2} alignItems="center" marginTop={0}>
+        {/* <Grid item xs={12}>
           <Typography variant="h6">Forcefully Restart Settings</Typography>
-        </Grid>
+        </Grid> */}
 
-        <Grid item xs={6}>
+        {/* <Grid item xs={6}>
           <TextField
             fullWidth
             label="Day Interval"
@@ -115,7 +114,7 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
             onChange={handleRestartChange("dayInterval")}
             inputProps={{ min: 1 }}
           />
-        </Grid>
+        </Grid> */}
 
         <Grid item xs={6}>
           <TextField

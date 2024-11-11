@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/endpoints";
+import { toast } from "react-toastify";
 
 export const AuthContext = createContext({
   user: null,
@@ -39,13 +40,13 @@ export const AuthProvider = ({ children }) => {
         message: response.data.message,
       };
 
-      
       setUser(userData);
       setToken(token);
       sessionStorage.setItem("token", token);
       sessionStorage.setItem("user", JSON.stringify(userData));
 
       navigate("/teams");
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Login failed: ", error);
     }

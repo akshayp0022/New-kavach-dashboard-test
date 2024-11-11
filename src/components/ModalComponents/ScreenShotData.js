@@ -16,6 +16,7 @@ import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import AccessTime from "@mui/icons-material/AccessTime";
 import dayjs from "dayjs";
 import { useStatus } from "../../context/status";
+import { useAuth } from "../../context/auth";
 
 const EmailSettings = ({ currentEmployee }) => {
   const { statusData, socket } = useStatus();
@@ -46,6 +47,8 @@ const EmailSettings = ({ currentEmployee }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
+  // const { token } = useAuth();
+  // console.log(token)
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
