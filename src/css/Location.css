@@ -1,0 +1,17 @@
+/* Location.css */
+.map-container {
+    background-color: #fff; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    padding: 20px; 
+    margin: 20px; 
+    height: 80vh; 
+  }
+  
+  .map-title {
+    text-align: start; 
+    margin-bottom: 20px; 
+    font-size: 24px; 
+    color: #333; 
+  }
+  

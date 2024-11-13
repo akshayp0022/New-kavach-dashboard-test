@@ -1,0 +1,23 @@
+#topnavbar{
+    position: fixed;
+    background-color: #6453E2;
+    color: white;
+    z-index: 40;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 0em;
+    width: 100%;
+    top: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* .css-37jdci-MuiTypography-root {
+    display: none;
+    margin-right: 50px;
+} */
+
+/* .css-dlwkee-MuiBadge-badge {
+    margin-right: 15px;
+} */
+

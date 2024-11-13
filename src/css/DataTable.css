@@ -1,0 +1,67 @@
+div[data-field="id"] {
+  padding: 10px 20px;
+}
+
+#tableCellHoriz {
+  border-radius: 50%;
+}
+
+#tableCellHoriz:hover {
+  background: lightgray;
+}
+
+div[data-field="id"] {
+  padding: 0px 20px;
+}
+
+.css-rsks93-MuiPaper-root-MuiDialog-paper {
+  max-width: none !important;
+  width: 100%;
+}
+
+.Modalwrapper {
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-cell--textRight div {
+  padding-left: 12px !important;
+}
+
+.css-1owgq8r-MuiDataGrid-root .MuiDataGrid-cell--textRight div {
+  padding-left: 8px;
+}
+
+
+/* status badge */
+.css-12cspl4-MuiBadge-root span,
+.css-syg0b3-MuiBadge-root span,
+.css-fxpvyx-MuiBadge-root span,
+.css-1kmlnv2-MuiBadge-root span {
+  margin-top: 25px;
+}
+
+ 
+.css-y4n9bg-MuiFormControl-root-MuiTextField-root {
+  width: 30% !important;
+}
+
+.css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-cell:focus {
+  outline: none !important;
+}
+
+@media (max-width: 730px) {
+  .Modalwrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  div[data-field="id"] {
+    padding: 0px 20px;
+  }
+
+  .css-1pmwg4c-MuiDataGrid-root .MuiDataGrid-cell--textRight div {
+    padding-left: 8px;
+  }
+}
