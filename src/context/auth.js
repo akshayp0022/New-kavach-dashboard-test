@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post(`/auth/login`, { username, password });
+      const response = await axios.post(`/auth/login`, { email:username, password });
       const token = response.data.data.token;
       const userData = {
         initials: response.data.userInitials,
