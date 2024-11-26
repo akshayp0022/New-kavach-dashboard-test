@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { FormGroup, Switch, Grid, Typography, Box, Button } from "@mui/material";
-import axios from "axios";
+import axios from "../../utils/endpoints";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/auth";
 
 const FeatureSettings = () => {
   const toggleOptions = {
@@ -23,6 +24,7 @@ const FeatureSettings = () => {
   });
 
   const [isUpdated, setIsUpdated] = useState(false);
+  const { token } = useAuth();
 
   const handleToggle = (option) => {
     setSettings((prevSettings) => ({
@@ -34,8 +36,12 @@ const FeatureSettings = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post("/api/feature-settings", settings); 
-      toast.success("Feature settings saved successfully!");
+      await axios.put("/features/updateAll", settings, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }); 
+      toast.success("Feature settings saved for all users!");
       setIsUpdated(false);
     } catch (error) {
       console.error("Error saving feature settings:", error);
