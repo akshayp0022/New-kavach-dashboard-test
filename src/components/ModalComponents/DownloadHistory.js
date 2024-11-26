@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { useStatus } from "../../context/status";
+import { toast } from "react-toastify";
+
+const TWO_HOURS = 2 * 60 * 60 * 1000;
 
 const DownloadHistoryTable = ({ downloadHistory }) => {
-  const [loading, setLoading] = useState(true);
-
   const extractDomain = (url) => {
     if (!url) return "Unknown";
     const domain = url.replace(/^(https?:\/\/)?/, "");
@@ -28,9 +29,9 @@ const DownloadHistoryTable = ({ downloadHistory }) => {
     })),
     ...(downloadHistory.FireFox || []).map((item, index) => ({
       id: `firefox-${item[1]}-${index}`,
-      nameWebsite: extractDomain(item[1]), // Trim the website URL
+      nameWebsite: extractDomain(item[1]),
       fileName: item[0]?.trim().split("\\").pop() || "N/A",
-      size: convertSizeToMB(item[2]), // Convert file size to MB
+      size: convertSizeToMB(item[2]),
       dateTime: item[4],
     })),
     ...(downloadHistory.Edge || []).map((item, index) => ({
@@ -67,23 +68,6 @@ const DownloadHistoryTable = ({ downloadHistory }) => {
     },
   ];
 
-  useEffect(() => {
-    setLoading(false);
-  }, [downloadHistory]);
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="90vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <div style={{ height: "90vh", width: "100%" }}>
       <DataGrid
@@ -102,43 +86,74 @@ const DownloadHistory = ({ currentEmployee }) => {
     FireFox: [],
     Edge: [],
   });
-  // eslint-disable-next-line
-  const [selectedEmployee, setSelectedEmployee] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { socket } = useStatus();
 
+  const saveToLocalStorage = (key, data) => {
+    const expiryTime = Date.now() + TWO_HOURS;
+    const dataToStore = { data, expiryTime };
+    localStorage.setItem(key, JSON.stringify(dataToStore));
+  };
+
+  const getFromLocalStorage = (key) => {
+    const storedData = localStorage.getItem(key);
+    if (!storedData) return null;
+
+    const parsedData = JSON.parse(storedData);
+    if (Date.now() > parsedData.expiryTime) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return parsedData.data;
+  };
+
   useEffect(() => {
-    console.log("empid: >>", currentEmployee?.employeeId);
-    console.log("websocket: >>", socket);
+    const localData = getFromLocalStorage(`downloadHistory-${currentEmployee?.employeeId}`);
+    if (localData) {
+      setDownloadHistory(localData);
+      setLoading(false);
+      return;
+    }
 
     if (currentEmployee?.employeeId && socket) {
-      setSelectedEmployee(currentEmployee.employeeId);
-
       socket.emit("getDownloadHistory", currentEmployee.employeeId);
 
       const timeoutId = setTimeout(() => {
-        setLoading(false);
-        setError(true);
-      }, 10000);
+        if (!error) {
+          toast.error("Failed to load download history: Timeout");
+          setLoading(false);
+          setError(true);
+        }
+      }, 15000);
 
       socket.on("sendDownloadHistory", (data) => {
-        console.log("Received data from server:", data);
         if (data?.employeeId === currentEmployee.employeeId) {
-          console.log("History matched, updating state");
           setDownloadHistory(data.data);
+          saveToLocalStorage(`downloadHistory-${currentEmployee.employeeId}`, data.data);
           setLoading(false);
-          clearTimeout(timeoutId); 
-        } else {
-          console.log("Employee ID does not match.");
+          clearTimeout(timeoutId);
         }
+      });
+
+      socket.on("fetchDownloadHistoryError", (errorInfo) => {
+        toast.error(
+          `Error fetching download history: ${
+            errorInfo?.error || "Unknown error"
+          }`
+        );
+        setLoading(false);
+        setError(true);
+        clearTimeout(timeoutId);
       });
 
       return () => {
         socket.off("sendDownloadHistory");
+        socket.off("fetchDownloadHistoryError");
       };
     }
-  }, [currentEmployee, socket]);
+  }, [currentEmployee, socket, error]);
 
   if (loading) {
     return (
@@ -167,12 +182,11 @@ const DownloadHistory = ({ currentEmployee }) => {
       </Box>
     );
   }
+
   return (
-    <>
-      <Container sx={{ mt: 2 }}>
-        <DownloadHistoryTable downloadHistory={downloadHistory} />
-      </Container>
-    </>
+    <Container sx={{ mt: 2 }}>
+      <DownloadHistoryTable downloadHistory={downloadHistory} />
+    </Container>
   );
 };
 

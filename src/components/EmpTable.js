@@ -31,7 +31,7 @@ const EmpTable = () => {
 
   // const { employees, fetchEmployees } = useEmployeeContext();
   const { statusData } = useStatus();
-  const { employees, loading, error } = useEmployeeContext();
+  const { employees, loading, error, status } = useEmployeeContext();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -68,30 +68,43 @@ const EmpTable = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading employees</div>;
+  // console.log("STAIUS is ", status);
 
-  const rowsData = employees.map(({ name, _id, employeeId, status }, index) => {
-    const employeeStatus = statusData[employeeId]?.status || "deactivated";
-    return {
-      id: index + 1,
-      status: <BadgeIcon status={employeeStatus} />,
-      name: (
-        <div>
-          <RoundNameCircle name={(name || "").trim()} status={employeeStatus} />{" "}
-          {employeeId}
-        </div>
-      ),
-      action: (
-        <MoreHorizIcon
-          id="tableCellHoriz"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClickOpen(employeeId);
-          }}
-        />
-      ),
-      employeeId,
-    };
-  });
+  const rowsData =
+    (employees?.length > 0 &&
+      employees.map(({ name, _id, employeeId, email }, index) => {
+        const employeeStatus =
+          statusData?.[employeeId]?.status ||
+          status?.[employeeId] ||
+          "deactivated";
+        // console.log("EMP STATUS IS ", employeeStatus);
+
+        return {
+          id: index + 1,
+          status: <BadgeIcon status={employeeStatus} />,
+          name: (
+            <div>
+              <RoundNameCircle
+                name={(name || "").trim()}
+                status={employeeStatus}
+              />{" "}
+              {employeeId}
+            </div>
+          ),
+          email,
+          action: (
+            <MoreHorizIcon
+              id="tableCellHoriz"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClickOpen(employeeId);
+              }}
+            />
+          ),
+          employeeId,
+        };
+      })) ||
+    [];
 
   const Newcolumns = [
     {
@@ -102,7 +115,7 @@ const EmpTable = () => {
           Icon={<NumbersOutlinedIcon sx={{ color: "#6754E2" }} />}
         />
       ),
-      width: 90,
+      width: 60,
       align: "center",
     },
     {
@@ -114,12 +127,21 @@ const EmpTable = () => {
         />
       ),
       renderCell: (params) => params.value,
-      width: isMidScreen
-        ? 150
-        : !isSideBarOpen
-        ? Math.round(windowWidth / 5) - 40
-        : Math.round(windowWidth / 5) - 40,
+      flex: 1,
+      minWidth: 150,
       align: "right",
+    },
+    {
+      field: "email",
+      renderHeader: () => (
+        <TextIcon
+          text={"Email"}
+          Icon={<BadgeOutlinedIcon sx={{ color: "#6754E2" }} />}
+        />
+      ),
+      flex: 1,
+      minWidth: 200,
+      align: "left",
     },
     {
       field: "employeeId",
@@ -129,11 +151,8 @@ const EmpTable = () => {
           Icon={<BadgeOutlinedIcon sx={{ color: "#6754E2" }} />}
         />
       ),
-      width: isMidScreen
-        ? 150
-        : !isSideBarOpen
-        ? Math.round(windowWidth / 3.5) - 40
-        : Math.round(windowWidth / 3.5) - 90,
+      flex: 1,
+      minWidth: 150,
       align: "left",
     },
     {
@@ -144,12 +163,9 @@ const EmpTable = () => {
           Icon={<CheckCircleOutlineIcon sx={{ color: "#6754E2" }} />}
         />
       ),
+      flex: 1,
       renderCell: (params) => params.value,
-      width: isMidScreen
-        ? 150
-        : !isSideBarOpen
-        ? Math.round(windowWidth / 3.5) - 40
-        : Math.round(windowWidth / 3.5) - 120,
+      minWidth: 150,
       align: "center",
     },
     {
@@ -161,8 +177,8 @@ const EmpTable = () => {
         />
       ),
       renderCell: (params) => params.value,
-      width: 150,
-      align: "left",
+      width: 100,
+      align: "center",
     },
   ];
 
@@ -206,6 +222,7 @@ const EmpTable = () => {
           >
             <DataGrid
               rows={rowsData}
+              checkboxSelection
               columns={Newcolumns}
               sx={{ border: 0 }}
               style={{
@@ -221,6 +238,7 @@ const EmpTable = () => {
         open={open}
         handleClose={handleClose}
         employees={employees}
+        status={status}
         modalList={modalList}
         handleChangeModalContent={handleChangeModalContent}
         modalContent={modalContent}

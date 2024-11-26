@@ -6,6 +6,7 @@ import "../../css/Location.css";
 import axios from "../../utils/endpoints";
 import { useAuth } from "../../context/auth";
 
+// Custom Marker Icon
 const icon = new L.Icon({
   iconUrl:
     "data:image/svg+xml;charset=UTF-8," +
@@ -22,20 +23,20 @@ const icon = new L.Icon({
 
 function Location({ currentEmployee }) {
   const mapRef = useRef();
-  const [position, setPosition] = useState([18.516726, 73.856255]); 
-  const [hasLocation, setHasLocation] = useState(false);
-  const [locations, setLocations] = useState([]); 
-
+  const [position, setPosition] = useState([18.516726, 73.856255]);
+  const [locations, setLocations] = useState([]);
+  const [addresses, setAddresses] = useState({});
   const { token } = useAuth();
 
+  const OPEN_CAGE_API_KEY = "0b09688065144a5eafb37acd5081acfa";
+
+  // Fetch current geolocation
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setPosition([latitude, longitude]);
-          setHasLocation(true);
-
           if (mapRef.current) {
             mapRef.current.setView([latitude, longitude], 13);
           }
@@ -49,26 +50,44 @@ function Location({ currentEmployee }) {
     }
   }, []);
 
+  // Fetch employee location data
   const getCurrentLocation = async () => {
     try {
       const response = await axios.get(
         `/userlocation/location/${currentEmployee.employeeId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,  
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(response.data.data);
-      setLocations(response.data.data); 
+      console.log("Locations fetched successfully:", response.data);
+      setLocations(response.data.data);
+
+      // Fetch addresses for each location
+      response.data.data.forEach((location) =>
+        fetchAddress(location._id, location.latitude, location.longitude)
+      );
     } catch (error) {
-      console.error(error.message);
+      console.error("Error fetching location data:", error);
+    }
+  };
+
+  // Fetch address for latitude and longitude using OpenCage
+  const fetchAddress = async (id, lat, lng) => {
+    try {
+      const response = await axios.get(
+        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${OPEN_CAGE_API_KEY}`
+      );
+      const address = response.data.results[0]?.formatted || "Address not found";
+      setAddresses((prev) => ({ ...prev, [id]: address }));
+    } catch (error) {
+      console.error("Error fetching address:", error);
     }
   };
 
   useEffect(() => {
     if (token) {
-      console.log("Token found in state", token);
       getCurrentLocation();
     } else {
       console.log("No token found in state");
@@ -90,11 +109,6 @@ function Location({ currentEmployee }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {/* {hasLocation && (
-          <Marker position={position} icon={icon}>
-            <Popup>Your current location</Popup>
-          </Marker>
-        )} */}
         {locations.map((location) => (
           <Marker
             key={location._id}
@@ -102,9 +116,20 @@ function Location({ currentEmployee }) {
             icon={icon}
           >
             <Popup>
-              Location at {location.latitude}, {location.longitude}
-              <br />
-              Timestamp: {new Date(location.createdAt).toLocaleString()}
+              <div>
+                <p>
+                  <strong>Address:</strong>{" "}
+                  {addresses[location._id] || "Fetching address..."}
+                </p>
+                <p>
+                  <strong>Coordinates:</strong> {location.latitude},{" "}
+                  {location.longitude}
+                </p>
+                <p>
+                  <strong>Timestamp:</strong>{" "}
+                  {new Date(location.updatedAt).toLocaleString()}
+                </p>
+              </div>
             </Popup>
           </Marker>
         ))}

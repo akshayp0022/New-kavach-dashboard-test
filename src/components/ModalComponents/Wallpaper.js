@@ -18,7 +18,6 @@ const Wallpaper = ({ currentEmployee }) => {
   const [wallpaperData, setWallpaperData] = useState({});
 
   const { socket } = useStatus();
-  console.log(socket);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];

@@ -10,10 +10,6 @@ import {
   ListItem,
   Button,
   Typography,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControl,
   FormControlLabel,
   Switch,
   Paper,
@@ -21,6 +17,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "../../utils/endpoints";
+import { toast } from "react-toastify";
 
 const WebsiteSetting = ({ currentEmployee }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -48,6 +45,7 @@ const WebsiteSetting = ({ currentEmployee }) => {
     }
   }, [currentEmployee]);
 
+  //black listing
   const handleAddNewWebsite = async () => {
     if (newWebsite.trim() === "") return;
     try {
@@ -64,9 +62,11 @@ const WebsiteSetting = ({ currentEmployee }) => {
       );
       setBlackListing((prev) => [...prev, newWebsite]);
       setNewWebsite("");
+      toast.success("Website Blocked Successfully!");
       console.log("Successfully added new website:", response.data);
     } catch (error) {
       console.error("Error adding new website:", error.message);
+      toast.error("Failed to Block Website. Please try again.");
     }
   };
 
@@ -107,7 +107,11 @@ const WebsiteSetting = ({ currentEmployee }) => {
   };
 
   const handleToggleChange = (event) => {
-    setWhiteListing({ ...whiteListing, enabled: event.target.checked });
+    setWhiteListing({
+      ...whiteListing,
+      enabled: event.target.checked,
+      proxyAddress: event.target.checked ? "127.0.0.1" : "none",
+    });
   };
 
   const handleAddException = () => {
@@ -150,9 +154,11 @@ const WebsiteSetting = ({ currentEmployee }) => {
           },
         }
       );
+      toast.success("White listing updated successfully!");
       setIsEditingWhite(false);
     } catch (error) {
       console.error("Error updating whiteListing:", error.message);
+      toast.error("Failed to update whiteListing. Please try again.");
     }
   };
 
@@ -179,7 +185,7 @@ const WebsiteSetting = ({ currentEmployee }) => {
             )}
 
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={5}>
+              {/* <Grid item xs={12} sm={5}>
                 <FormControl fullWidth variant="outlined">
                   <InputLabel>Proxy Address</InputLabel>
                   <Select
@@ -199,7 +205,7 @@ const WebsiteSetting = ({ currentEmployee }) => {
                     </MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12} sm={3}>
                 <TextField
@@ -323,9 +329,17 @@ const WebsiteSetting = ({ currentEmployee }) => {
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={handleAddNewWebsite}>
-                          <AddIcon />
-                        </IconButton>
+                        {/* <IconButton onClick={handleAddNewWebsite}>
+                          <AddIcon color="primary"/>
+                        </IconButton> */}
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleAddNewWebsite}
+                          sx={{ borderRadius: "8px" }}
+                        >
+                          Save
+                        </Button>
                       </InputAdornment>
                     ),
                   }}

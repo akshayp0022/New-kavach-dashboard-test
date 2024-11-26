@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post(`/auth/login`, { username, password });
+      const response = await axios.post(`/auth/login`, { email:username, password });
       const token = response.data.data.token;
       const userData = {
         initials: response.data.userInitials,
@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       toast.success(response.data.message);
     } catch (error) {
       console.error("Login failed: ", error);
+      toast.error(error.response.data.message);
     }
   };
 

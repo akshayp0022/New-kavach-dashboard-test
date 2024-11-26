@@ -64,14 +64,14 @@ export default function TransitionsModal() {
 export const ModalContentTitle = ({ contentValue }) => {
   const titleMapping = {
     features_settings: "Features Settings",
-    forcefully_restart: "Forcefully Restart",
+    system_restart: "System Restart",
     capture_screenshot: "Screenshot",
     website_settings: "Website Settings",
     internet_history: "Internet History",
     download_history: "Download History",
     keylogger_history: "Keylogger History",
     wallpaper_settings: "Wallpaper Settings",
-    test: "test Settings",
+    featurex: "featurex",
     live_location: "Live Location",
   };
 
@@ -87,7 +87,7 @@ export const ModalContent = ({ contentValue, currentEmployee }) => {
     case "features_settings":
       return <FeatureSettings currentEmployee={currentEmployee} />;
 
-    case "forcefully_restart":
+    case "system_restart":
       return <ForceFullyRestart currentEmployee={currentEmployee} />;
 
     case "capture_screenshot":
@@ -108,7 +108,7 @@ export const ModalContent = ({ contentValue, currentEmployee }) => {
     case "wallpaper_settings":
       return <Wallpaper currentEmployee={currentEmployee} />;
 
-    case "test":
+    case "featurex":
       return <Records currentEmployee={currentEmployee} />;
 
     case "live_location":

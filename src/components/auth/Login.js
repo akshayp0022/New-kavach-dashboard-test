@@ -18,15 +18,47 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
-
   const navigate = useNavigate();
+
+  const [errors, setErrors] = useState({
+    email: "",
+    password: ""
+  });
 
   const handleClickShowPassword = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  // Basic email and password validators
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 8;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    // Reset errors
+    setErrors({ email: "", password: "" });
+
+    // Perform validation checks
+    let valid = true;
+
+    // if (!validateEmail(username)) {
+    //   setErrors(prev => ({ ...prev, email: "Please enter a valid email address" }));
+    //   valid = false;
+    // }
+
+    // if (!validatePassword(password)) {
+    //   setErrors(prev => ({ ...prev, password: "Password must be at least 8 characters long" }));
+    //   valid = false;
+    // }
+
+    if (!valid) return;
 
     try {
       await login(username, password);
@@ -40,14 +72,17 @@ function Login() {
     <div>
       {/* Email Input */}
       <TextField
-        label="Name"
+        label="Email"
         name="userName"
         type="text"
         id="name"
         fullWidth
         margin="normal"
         value={username}
+        placeholder="john.doe@gmail.com"
         onChange={(e) => setUsername(e.target.value)}
+        error={!!errors.email}
+        helperText={errors.email}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -68,6 +103,9 @@ function Login() {
         onChange={(e) => setPassword(e.target.value)}
         fullWidth
         margin="normal"
+        placeholder="*********"
+        error={!!errors.password}
+        helperText={errors.password}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

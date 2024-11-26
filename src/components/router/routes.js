@@ -5,6 +5,8 @@ import C1 from "../Component1";
 import Login from "../Login";
 import ProtectedRoutes from "./ProtectedRoutes";
 import EmpTable from "../EmpTable";
+import AllUserLocations from "../AllUserLocations";
+import CommonSettings from "../CommonSettings";
 
 function RoutesHandler() {
   return (
@@ -29,7 +31,10 @@ function RoutesHandler() {
             <Route path="/inbox" element={<C1 pageName={"Inbox"} />} />
             <Route path="/members" element={<C1 pageName={"Members"} />} />
             <Route path="/teams" element={<EmpTable />} />
+            <Route path="/user-location" element={<AllUserLocations />}/>
+            <Route path="/common-settings" element={<CommonSettings/>}/>
           </Route>
+
         </Route>
       </Routes>
     </div>

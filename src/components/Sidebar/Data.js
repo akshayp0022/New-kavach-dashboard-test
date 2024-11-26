@@ -7,15 +7,19 @@ import {
   MoveToInbox as InboxIcon,
   Mail as MailIcon,
   LogoutOutlined as LogoutOutlinedIcon,
+  LocationOn as LocationOnIcon,
+  SettingsOutlined as SettingsOutlinedIcon,
 } from "@mui/icons-material";
 
 export const renderIcons = [
   { text: "Teams", data: <GroupAddOutlinedIcon /> },
+  { text: "User-Location", data: <LocationOnIcon /> },
+  { text: "Common-Settings", data: <SettingsOutlinedIcon /> }, 
   { text: "Screenshot", data: <ScreenshotMonitorOutlinedIcon /> },
   { text: "Apps", data: <AppsOutlinedIcon /> },
-  { text: "Attendence", data: <CalendarMonthOutlinedIcon /> },
+  // { text: "Attendence", data: <CalendarMonthOutlinedIcon /> },
   { text: "Mail", data: <MailIcon /> },
-  { text: "Inbox", data: <InboxIcon /> },
+  // { text: "Inbox", data: <InboxIcon /> },
 ];
 
 export const fourIconsCommonStyle = {

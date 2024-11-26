@@ -21,6 +21,7 @@ import {
   Legend,
 } from "chart.js";
 import { useStatus } from "../../context/status";
+import { toast } from "react-toastify";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -38,8 +39,10 @@ const InternetHistory = ({ currentEmployee }) => {
   const socketRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
   const { socket } = useStatus();
-  console.log("socket",socket);
-  
+
+  const EXPIRATION_TIME = 2 * 60 * 60 * 1000;
+  const LOCAL_STORAGE_KEY = "browserHistory";
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -57,55 +60,125 @@ const InternetHistory = ({ currentEmployee }) => {
     }
   };
 
+  const normalizeUrl = (url) => {
+    try {
+      const hostname = new URL(url).hostname;
+      return hostname.replace("www.", "");
+    } catch {
+      return url; // Return the original URL if it cannot be parsed
+    }
+  };
+
   useEffect(() => {
     if (currentEmployee?.employeeId) {
       console.log("Employee ID:", currentEmployee.employeeId);
     }
   }, [currentEmployee]);
 
+  const saveToLocalStorage = (key, data) => {
+    const expiryTime = Date.now() + TWO_HOURS;
+    const dataToStore = { data, expiryTime };
+    localStorage.setItem(key, JSON.stringify(dataToStore));
+  };
+
+  const getFromLocalStorage = (key) => {
+    const storedData = localStorage.getItem(key);
+    if (!storedData) return null;
+
+    const parsedData = JSON.parse(storedData);
+    if (Date.now() > parsedData.expiryTime) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return parsedData.data;
+  };
+
   useEffect(() => {
-    if (socket && currentEmployee?.employeeId) {
-      setLoading(true); // Show loader
+    const localKey = `browserHistory-${currentEmployee?.employeeId}`;
+    const localData = getFromLocalStorage(localKey);
+
+    if (localData) {
+      setBrowserHistory(localData);
+      setLoading(false);
+      return;
+    }
+
+    if (currentEmployee?.employeeId && socket) {
+      setLoading(true);
+
+      // Emit event to fetch browser history
       socket.emit("getBrowserHistory", currentEmployee.employeeId);
 
-      socket.on("sendBrowserHistory", (data) => {
-        if (data.error) {
-          setError(data.error);
-          setBrowserHistory([]);
-          setLoading(false); // Hide loader
-        } else if (data && data.employeeId) {
-          if (
-            String(data.employeeId).trim() ===
-            String(currentEmployee?.employeeId).trim()
-          ) {
-            const chromeHistory = (data.data.Chrome || []).filter(
-              (item) => item !== "No data found"
-            );
-            const edgeHistory = (data.data.Edge || []).filter(
-              (item) => item !== "No data found"
-            );
-            const firefoxHistory = (data.data.Firefox || []).filter(
-              (item) => item !== "No data found"
-            );
-
-            const combinedHistory = [
-              ...chromeHistory,
-              ...edgeHistory,
-              ...firefoxHistory,
-            ];
-
-            setBrowserHistory(combinedHistory);
-            setError(null);
-            setLoading(false); // Hide loader
-          }
+      // Handle timeout for socket response
+      const timeoutId = setTimeout(() => {
+        if (!error) {
+          toast.error("Failed to load browser history: Timeout");
+          setLoading(false);
+          setError(true);
         }
+      }, 15000);
+
+      // Listen for browser history data
+      socket.on("sendBrowserHistory", (data) => {
+        if (data?.employeeId === currentEmployee.employeeId) {
+          const chromeHistory = (data.data.Chrome || []).filter(
+            (item) => item !== "No data found"
+          );
+          const edgeHistory = (data.data.Edge || []).filter(
+            (item) => item !== "No data found"
+          );
+          const firefoxHistory = (data.data.Firefox || []).filter(
+            (item) => item !== "No data found"
+          );
+
+          const combinedHistory = [
+            ...chromeHistory,
+            ...edgeHistory,
+            ...firefoxHistory,
+          ];
+
+          const consolidatedHistory = combinedHistory.reduce((acc, curr) => {
+            const normalizedUrl = normalizeUrl(curr.url);
+            const existing = acc[normalizedUrl];
+
+            if (existing) {
+              existing.visit_count += curr.visit_count;
+            } else {
+              acc[normalizedUrl] = {
+                ...curr,
+                url: normalizedUrl,
+              };
+            }
+            return acc;
+          }, {});
+
+          const consolidatedArray = Object.values(consolidatedHistory);
+
+          setBrowserHistory(consolidatedArray);
+          saveToLocalStorage(localKey, consolidatedArray);
+          setLoading(false);
+          clearTimeout(timeoutId);
+        }
+      });
+
+      // Handle errors
+      socket.on("fetchBrowserHistoryError", (errorInfo) => {
+        toast.error(
+          `Error fetching browser history: ${
+            errorInfo?.error || "Unknown error"
+          }`
+        );
+        setLoading(false);
+        setError(true);
+        clearTimeout(timeoutId);
       });
 
       return () => {
         socket.off("sendBrowserHistory");
+        socket.off("fetchBrowserHistoryError");
       };
     }
-  }, [socket, currentEmployee]);
+  }, [currentEmployee, socket, error]);
 
   useEffect(() => {
     if (browserHistory.length > 0) {
@@ -122,7 +195,12 @@ const InternetHistory = ({ currentEmployee }) => {
   return (
     <div>
       {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="400px"
+        >
           <CircularProgress />
         </Box>
       ) : error ? (
@@ -211,8 +289,18 @@ const InternetHistory = ({ currentEmployee }) => {
               <Bar
                 data={{
                   labels: chartData.labels.map((url) => {
-                    const hostname = new URL(url).hostname;
-                    return hostname.replace("www.", "").split(".")[0];
+                    try {
+                      // Prepend "https://" if no protocol is present
+                      const formattedUrl =
+                        url.startsWith("http://") || url.startsWith("https://")
+                          ? url
+                          : `https://${url}`;
+                      const hostname = new URL(formattedUrl).hostname;
+                      return hostname.replace("www.", "").split(".")[0]; // Extract domain name
+                    } catch (error) {
+                      console.error(`Invalid URL encountered: ${url}`, error);
+                      return url; // Use the original URL as a fallback
+                    }
                   }),
                   datasets: [
                     {
@@ -226,21 +314,21 @@ const InternetHistory = ({ currentEmployee }) => {
                 }}
                 options={{
                   responsive: true,
-                  maintainAspectRatio: false, // Allows you to set a custom height and width
+                  maintainAspectRatio: false,
                   scales: {
                     x: {
                       ticks: {
                         font: {
-                          size: 14, // Larger font for the URL labels
+                          size: 14,
                           weight: "bold",
                         },
-                        color: "#333", // Darker color for better readability
+                        color: "#333",
                       },
                       title: {
                         display: true,
                         text: "URLs",
                         font: {
-                          size: 16, // Axis title font size
+                          size: 16,
                           weight: "bold",
                         },
                         color: "#000",
@@ -250,7 +338,7 @@ const InternetHistory = ({ currentEmployee }) => {
                       beginAtZero: true,
                       ticks: {
                         font: {
-                          size: 14, // Larger font for Y-axis labels
+                          size: 14,
                         },
                         color: "#333",
                       },
@@ -258,7 +346,7 @@ const InternetHistory = ({ currentEmployee }) => {
                         display: true,
                         text: "Visit Count",
                         font: {
-                          size: 16, // Axis title font size
+                          size: 16,
                           weight: "bold",
                         },
                         color: "#000",
@@ -269,15 +357,15 @@ const InternetHistory = ({ currentEmployee }) => {
                     legend: {
                       labels: {
                         font: {
-                          size: 14, // Legend font size
+                          size: 14,
                         },
                         color: "#333",
                       },
                     },
                   },
                 }}
-                height={400} // Set the height of the chart
-                width={800} // Set the width of the chart
+                height={400}
+                width={800}
               />
             </Box>
           )}

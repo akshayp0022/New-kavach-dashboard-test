@@ -9,7 +9,7 @@ export const TextIcon = ({ text, Icon }) => {
         gap: "4px",
         justifyContent: "start",
       }}
-    >
+    > 
       {Icon}
       <p style={{ fontWeight: "bolder" }}>{text}</p>
     </div>

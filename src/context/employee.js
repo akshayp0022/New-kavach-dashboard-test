@@ -10,6 +10,7 @@ export const useEmployeeContext = () => {
 
 export const EmployeeProvider = ({ children }) => {
   const [employees, setEmployees] = useState([]);
+  const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useAuth();
@@ -24,6 +25,7 @@ export const EmployeeProvider = ({ children }) => {
         },
       });
       setEmployees(response.data.data);
+      setStatus(response.data.statusData);
       console.log("Employees fetched successfully:", response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -43,7 +45,7 @@ export const EmployeeProvider = ({ children }) => {
 
   return (
     <EmployeeContext.Provider
-      value={{ employees, loading, error, fetchEmployees }}
+      value={{ employees, loading, error, fetchEmployees, status }}
     >
       {children}
     </EmployeeContext.Provider>

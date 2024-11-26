@@ -1,0 +1,54 @@
+.settings-container {
+    display: flex;
+    height: 90vh;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    margin-top: 65px;
+    margin-left: 50px;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 20%;
+    background-color: #f4f4f4;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tab {
+    padding: 15px;
+    margin: 5px 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+  }
+  
+  .tab.active {
+    background-color: #6453e2;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .tab:hover {
+    background-color: #f0f0f0;
+    color: #0f050b;
+    
+  }
+  
+  /* Content Area */
+  .content-area {
+    flex: 1;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .content {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  

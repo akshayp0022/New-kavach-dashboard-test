@@ -5,6 +5,19 @@ import { ws } from "../utils/endpoints";
 
 const StatusContext = createContext();
 
+const getIndianTime = () => {
+  return new Intl.DateTimeFormat("en-IN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+};
+
 export const StatusProvider = ({ children }) => {
   const { token } = useAuth();
   const [statusData, setStatusData] = useState({});
@@ -14,7 +27,6 @@ export const StatusProvider = ({ children }) => {
   // console.log(timeString);
 
   useEffect(() => {
-    console.log("token available---->", token);
     if (token) {
       const socketConnection = io(ws, {
         transports: ["websocket"],
@@ -23,12 +35,15 @@ export const StatusProvider = ({ children }) => {
         reconnectionDelay: 500,
       });
 
-      socketConnection.on("connection", () => {
+      socketConnection.on("connect", () => {
         console.log("Connected to WebSocket server.");
       });
 
       socketConnection.on("sendEmployeeStatus", (data) => {
-        console.log("Received statuses from server :", data);
+        console.log(
+          `[${getIndianTime()}] Received statuses from server:`,
+          data
+        );
         if (data && data.employeeId && data.status) {
           setStatusData((prevData) => ({
             ...prevData,

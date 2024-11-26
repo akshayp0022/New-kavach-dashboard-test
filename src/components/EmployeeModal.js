@@ -10,14 +10,18 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon,
 } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useStatus } from "../context/status";
+import { ModalIconList } from "./Table/TableData";
+import { useEmployeeContext } from "../context/employee";
 
 const EmployeeModal = ({
   open,
   handleClose,
   employees,
+  // status,
   modalList,
   handleChangeModalContent,
   modalContent,
@@ -27,15 +31,37 @@ const EmployeeModal = ({
   setActiveItem,
 }) => {
   const { statusData } = useStatus();
+  const { status } = useEmployeeContext()
+  // console.log(status)
+  // console.log(statusData);
   const currentEmployee = employees?.find(
     (emp) => emp.employeeId === currentEmployeeId
   );
 
-  const employeeStatus = statusData?.[currentEmployeeId]?.status || "deactivated";
+  const employeeStatus = status?.[currentEmployeeId] || "deactivated";
+  // console.log(employeeStatus)
+
+  if (!currentEmployeeId || !currentEmployee) {
+    // console.log("No employee found for ID:", currentEmployeeId);
+    return null;
+  }
+
+  const iconContainerStyles = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "40px",
+    height: "40px",
+    borderRadius: "8px",
+    // backgroundColor: 'transparent',
+    // '&:hover': {
+    //   backgroundColor: '#f5f5f5',
+    // }
+  };
 
   // Safeguard: Check if currentEmployeeId exists before rendering
   if (!currentEmployeeId || !currentEmployee) {
-    return null; 
+    return null;
   }
 
   const handleListItemClick = (item) => {
@@ -54,7 +80,9 @@ const EmployeeModal = ({
                 status={employeeStatus}
               />
             </Typography>
-            <Typography id="employeeId">{currentEmployeeId}</Typography>
+            <Typography id="employeeId" sx={{ whiteSpace: "nowrap" }}>{currentEmployeeId}</Typography>
+            {/* <Typography id= "statusTxt" sx={{ display: "flex", alignItems: "center"}}>{employeeStatus}</Typography> */}
+
           </div>
           {isModal ? (
             <DialogActions onClick={handleClose}>
@@ -62,9 +90,9 @@ const EmployeeModal = ({
             </DialogActions>
           ) : (
             <List>
-              {modalList.map((item) => (
+              {modalList.map((item, index) => (
                 <ListItem
-                  key={item} 
+                  key={item}
                   id="listItem"
                   onClick={() => handleListItemClick(item)}
                   sx={{
@@ -74,6 +102,14 @@ const EmployeeModal = ({
                     "&:hover": { backgroundColor: "#e0e0e0" },
                   }}
                 >
+                  <ListItemIcon
+                    sx={{
+                      ...iconContainerStyles,
+                      color: activeItem === item ? "#1976d2" : "#696969",
+                    }}
+                  >
+                    {ModalIconList[index]}
+                  </ListItemIcon>
                   <ListItemText primary={item} style={{ fontSize: "10px" }} />
                 </ListItem>
               ))}

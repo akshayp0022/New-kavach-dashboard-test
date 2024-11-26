@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import axios from "../../utils/endpoints";
 import { useEmployeeContext } from "../../context/employee";
+import { toast } from "react-toastify";
 const FeatureSettings = ({ currentEmployee }) => {
   const toggleOptions = {
     usbPolicy: "Restrict Access To USB Setting",
@@ -16,9 +17,9 @@ const FeatureSettings = ({ currentEmployee }) => {
     rightClick: "Restrict Access To Right Click",
     systemSettings: "Restrict Access To System Settings",
     copyPaste: "Restrict Access To Copy & Paste",
-    cameraSetting: "Restrict Access To Camera Setting",
+    // cameraSetting: "Restrict Access To Camera Setting",
     internetAccess: "Restrict Access To Internet access",
-    gps: "Restrict Access to GPS",
+    // gps: "Restrict Access to GPS",
   };
 
   const { fetchEmployees } = useEmployeeContext();
@@ -88,8 +89,10 @@ const FeatureSettings = ({ currentEmployee }) => {
   
       setIsUpdated(false); 
       fetchEmployees();
+      toast.success("Feature settings updated successfully!");
     } catch (error) {
       console.error("Error updating feature settings:", error);
+      toast.error("Error updating feature settings.");
     }
   };
   
