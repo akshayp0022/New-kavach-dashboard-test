@@ -87,8 +87,8 @@ const WebsiteSettings = ({ currentEmployee }) => {
 
   const handleSaveWhite = async () => {
     try {
-      await axios.put(
-        `/features/${currentEmployee.employeeId}`,
+      await axios.post(
+        `/commonWebsiteSettings`,
         {
           whiteListing: whiteListing,
         },
@@ -115,8 +115,8 @@ const WebsiteSettings = ({ currentEmployee }) => {
   const handleAddNewWebsite = async () => {
     if (newWebsite.trim() === "") return;
     try {
-      const response = await axios.put(
-        `/features/${currentEmployee.employeeId}`,
+      const response = await axios.post(
+        `/commonWebsiteSettings`,
         {
           websiteBlocker: [...blackListing, newWebsite],
         },
@@ -128,7 +128,7 @@ const WebsiteSettings = ({ currentEmployee }) => {
       );
       setBlackListing((prev) => [...prev, newWebsite]);
       setNewWebsite("");
-      toast.success("Website Blocked Successfully!");
+      toast.success("Website Blocked Successfully for all users!");
       console.log("Successfully added new website:", response.data);
     } catch (error) {
       console.error("Error adding new website:", error.message);

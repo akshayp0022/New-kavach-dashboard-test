@@ -55,6 +55,7 @@ export const RoundNameCircle = ({ name = "", status }) => {
         }}
       ></Badge>
       <Typography variant="span">{name}</Typography>
+      {/* <h5 style={{ marginBottom: "15px" }}>{name}</h5> */}
     </div>
   );
 };

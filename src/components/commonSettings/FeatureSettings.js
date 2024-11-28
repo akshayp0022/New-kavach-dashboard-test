@@ -36,7 +36,7 @@ const FeatureSettings = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put("/features/updateAll", settings, {
+      await axios.put("/manage/updateAll", settings, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

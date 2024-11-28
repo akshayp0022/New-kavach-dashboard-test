@@ -59,8 +59,14 @@ const EmailSettings = ({ currentEmployee }) => {
 
   const handleScreenshotClick = async () => {
     setIsLoading(true); 
+  try {
     await handleTakeScreenshot(); 
+  } catch (error) {
+    console.error("Error taking screenshot: ", error);
+    toast.error("Failed to take screenshot. Please try again.");
+  } finally {
     setIsLoading(false); 
+  }
   };
 
   const handleChange = (e, settingType) => {
@@ -102,7 +108,6 @@ const EmailSettings = ({ currentEmployee }) => {
 
   useEffect(() => {
     if (socket) {
-      // Listen for screenshot error from the server
       socket.on('screenshotError', (errorMessage) => {
         toast.error(errorMessage || "An error occurred while processing the screenshot.");
       });
@@ -110,7 +115,7 @@ const EmailSettings = ({ currentEmployee }) => {
   
     return () => {
       if (socket) {
-        socket.off('screenshotError'); // Clean up the event listener on component unmount
+        socket.off('screenshotError'); 
       }
     };
   }, [socket]);

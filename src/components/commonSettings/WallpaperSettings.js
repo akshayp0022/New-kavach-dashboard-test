@@ -56,7 +56,7 @@ const Wallpaper = ({ currentEmployee }) => {
 
     try {
       const response = await axios.post(
-        `/wallpaper/upload/${currentEmployee?.employeeId}`,
+        `/wallpaper/upload`,
         formData,
         {
           headers: {
@@ -75,7 +75,7 @@ const Wallpaper = ({ currentEmployee }) => {
 
       if (socket) {
         console.log("Socket connected:", socket.id);
-        socket.emit("trigger_change_wallpaper", updatedWallpaperData);
+        socket.emit("change_wallpaper", updatedWallpaperData);
         console.log("Emitting wallpaper change:", updatedWallpaperData);
       }
 

@@ -74,14 +74,15 @@ const EmployeeModal = ({
       <div className="Modalwrapper">
         <div className="sidebar-modal">
           <div>
-            <Typography variant="h6" id="userName">
+            <Typography variant="h6" id="userName" >
               <RoundNameCircle
                 name={currentEmployee?.name?.trim() || "N/A"}
                 status={employeeStatus}
               />
             </Typography>
-            <Typography id="employeeId" sx={{ whiteSpace: "nowrap" }}>{currentEmployeeId}</Typography>
-            {/* <Typography id= "statusTxt" sx={{ display: "flex", alignItems: "center"}}>{employeeStatus}</Typography> */}
+            {/* <h4 id="employeeId" style={{ whiteSpace: "nowrap", position: "absolute", top: "55px" }}>{currentEmployeeId}</h4> */}
+            <Typography id="employeeId" sx={{ whiteSpace: "nowrap",  }}>{currentEmployeeId}</Typography>
+            {/* <Typography id= "statusTxt" sx={{ display: "flex", alignItems: "end"}}>{employeeStatus}</Typography> */}
 
           </div>
           {isModal ? (

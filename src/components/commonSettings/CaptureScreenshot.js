@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, InputAdornment, IconButton } from "@mui/material";
-import axios from "axios";
+import axios from "../../utils/endpoints";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "../../context/auth";
 
 const CaptureScreenshot = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const CaptureScreenshot = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const { token } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,9 +22,13 @@ const CaptureScreenshot = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post(
-        "/api/capture-screenshot-settings",
-        formData
+      const response = await axios.put(
+        "/email/update/all",
+        formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       alert("Settings saved successfully!");
     } catch (error) {
@@ -57,6 +63,7 @@ const CaptureScreenshot = () => {
         >
           <TextField
             label="Sender Email"
+            placeholder="john.doe@bhartisofttech.com"
             sx={{ flex: "1 1 45%" }}
             name="senderEmail"
             value={formData.senderEmail}
@@ -64,6 +71,7 @@ const CaptureScreenshot = () => {
           />
           <TextField
             label="Receiver Email"
+            placeholder="john.doe@bhartisofttech.com"
             sx={{ flex: "1 1 45%" }}
             name="receiverEmail"
             value={formData.receiverEmail}
@@ -72,6 +80,7 @@ const CaptureScreenshot = () => {
 
           <TextField
             label="CC Email"
+            placeholder="john.doe@bhartisofttech.com"
             sx={{ flex: "1 1 45%" }}
             name="ccEmail"
             value={formData.ccEmail}
@@ -79,6 +88,7 @@ const CaptureScreenshot = () => {
           />
           <TextField
             label="Password"
+            placeholder="**********"
             type={showPassword ? "text" : "password"}
             sx={{ flex: "1 1 45%" }}
             name="password"
