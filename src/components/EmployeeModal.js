@@ -38,11 +38,13 @@ const EmployeeModal = ({
     (emp) => emp.employeeId === currentEmployeeId
   );
 
-  const employeeStatus = status?.[currentEmployeeId] || "deactivated";
-  // console.log(employeeStatus)
+  const employeeStatus =
+    statusData?.[currentEmployeeId]?.status ||
+    status?.[currentEmployeeId] ||
+    "deactivated";
 
+  // Safeguard: Check if currentEmployeeId exists before rendering
   if (!currentEmployeeId || !currentEmployee) {
-    // console.log("No employee found for ID:", currentEmployeeId);
     return null;
   }
 
@@ -81,7 +83,7 @@ const EmployeeModal = ({
               />
             </Typography>
             {/* <h4 id="employeeId" style={{ whiteSpace: "nowrap", position: "absolute", top: "55px" }}>{currentEmployeeId}</h4> */}
-            <Typography id="employeeId" sx={{ whiteSpace: "nowrap",  }}>{currentEmployeeId}</Typography>
+            <Typography id="employeeId" sx={{ whiteSpace: "nowrap", }}>{currentEmployeeId}</Typography>
             {/* <Typography id= "statusTxt" sx={{ display: "flex", alignItems: "end"}}>{employeeStatus}</Typography> */}
 
           </div>

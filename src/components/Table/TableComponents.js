@@ -21,6 +21,7 @@ export const RoundNameCircle = ({ name = "", status }) => {
   let nameInitials = name.split(" ");
   nameInitials.forEach((value) => (initialNameValue += value[0]));
   return (
+    <>
     <div className="roundNameCircle">
       <Badge
         badgeContent={initialNameValue.toUpperCase()}
@@ -57,6 +58,7 @@ export const RoundNameCircle = ({ name = "", status }) => {
       <Typography variant="span">{name}</Typography>
       {/* <h5 style={{ marginBottom: "15px" }}>{name}</h5> */}
     </div>
+    </>
   );
 };
 
