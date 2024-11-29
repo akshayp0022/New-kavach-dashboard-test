@@ -96,7 +96,7 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
         dayInterval: Number(
           currentEmployee.featureSettings.forcefullyRestart.dayInterval
         ),
-        time: time24Hour, // converted 24-hour format time
+        time: Number(time24Hour), // converted 24-hour format time
       });
 
       console.log("Emitted data", {
@@ -105,7 +105,7 @@ const ForcefullyRestartSettings = ({ currentEmployee }) => {
         dayInterval: Number(
           currentEmployee.featureSettings.forcefullyRestart.dayInterval
         ),
-        time: time24Hour,
+        time: Number(time24Hour),
       });
 
       toast.success("Settings saved successfully!");

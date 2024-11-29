@@ -32,11 +32,15 @@ div[data-field="id"] {
   padding-left: 8px;
 }
 
-.css-178fp2h-MuiBadge-root span,
+/* .css-178fp2h-MuiBadge-root span,
 .css-2jhcv1-MuiBadge-root span,
 .css-13dpm03-MuiBadge-root span,
 .css-6khlnn-MuiBadge-root span {
   margin-top: 25px;
+} */
+
+.statusBadge span{
+  margin-top: 25px !important;
 }
 
 .css-y4n9bg-MuiFormControl-root-MuiTextField-root {

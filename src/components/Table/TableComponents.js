@@ -116,6 +116,7 @@ export const BadgeIcon = ({ status }) => {
     >
       <Badge
         badgeContent={status}
+        className="statusBadge"
         sx={{
           "& span": {
             textTransform: "capitalize",
